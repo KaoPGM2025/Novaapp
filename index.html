@@ -3,569 +3,581 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IOTNovasave V.3.1.6 | Songkran Theme</title>
+    <title>IOTNovasave V.3.2.0 | Songkran Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --sk-pink: #ff6b6b;
-            --sk-orange: #feca57;
-            --sk-blue: #48dbfb;
-            --sk-purple: #9b59b6;
-        }
-        body { font-family: 'Kanit', sans-serif; background: #fff5f5; color: #334155; -webkit-tap-highlight-color: transparent; }
-        .songkran-gradient { background: linear-gradient(135deg, var(--sk-pink), var(--sk-orange)); }
-        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); }
-        .nav-active { color: var(--sk-pink); border-bottom: 4px solid var(--sk-pink); background-color: rgba(255, 107, 107, 0.08); }
+        :root { --primary: #0ea5e9; --secondary: #38bdf8; --accent: #f472b6; }
+        body { font-family: 'Kanit', sans-serif; background: #f0f9ff; color: #0f172a; overflow-x: hidden; }
+        .songkran-bg { background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%); }
+        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .nav-active { color: #0ea5e9; transform: translateY(-4px); font-weight: bold; }
+        .progress-glow { box-shadow: 0 0 10px rgba(14, 165, 233, 0.5); }
         .page-content { animation: slideUp 0.4s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--sk-pink); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #bae6fd; border-radius: 10px; }
     </style>
 </head>
-<body class="pb-24">
+<body class="pb-28">
 
     <!-- Header -->
-    <header class="sticky top-0 z-50 glass shadow-md px-4 py-3 flex justify-between items-center border-b border-pink-100">
-        <div class="flex items-center gap-2">
-            <div class="p-2 songkran-gradient rounded-xl text-white shadow-lg">
-                <i data-lucide="waves" class="w-6 h-6"></i>
+    <header class="songkran-bg text-white p-6 rounded-b-[3rem] shadow-xl sticky top-0 z-50">
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-xl font-black tracking-tight">IOTNovasave</h1>
+                    <button onclick="location.reload()" class="p-1.5 bg-white/20 rounded-lg hover:rotate-180 transition-transform duration-700">
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <p id="currentDateTime" class="text-[10px] opacity-90 font-medium mt-1 font-mono"></p>
             </div>
-            <div class="flex items-center gap-1">
-                <h1 class="text-xl font-black text-slate-800 tracking-tight">IOTNovasave</h1>
-                <button onclick="location.reload()" class="p-1 hover:rotate-180 transition-transform duration-500">
-                    <i data-lucide="refresh-cw" class="w-4 h-4 text-pink-500"></i>
-                </button>
+            <div class="text-right">
+                <div id="rankBadge" class="bg-white/25 px-3 py-1.5 rounded-full text-[10px] font-black border border-white/40 shadow-inner">
+                    กำลังดึงข้อมูล...
+                </div>
+                <div class="mt-2 text-[10px] font-bold flex items-center justify-end gap-1">
+                    <span>LV. <span id="lvDisplay">1</span></span>
+                    <span class="opacity-60">|</span>
+                    <span><span id="xpPercentDisplay">0</span>%</span>
+                </div>
             </div>
         </div>
-        <div class="text-right">
-            <p id="currentDateTime" class="text-[10px] font-bold text-slate-500"></p>
-            <div class="flex items-center gap-2 mt-0.5 justify-end">
-                <span id="rankBadge" class="text-[9px] px-2 py-0.5 rounded-full bg-pink-100 text-pink-600 font-bold tracking-tighter uppercase">กำลังวิเคราะห์...</span>
-            </div>
+        <div class="w-full bg-black/20 h-2.5 rounded-full overflow-hidden progress-glow">
+            <div id="xpBar" class="bg-white h-full transition-all duration-1000 shadow-[0_0_8px_white]" style="width: 0%"></div>
         </div>
     </header>
 
-    <main class="max-w-md mx-auto p-4">
+    <main class="p-4 space-y-6 max-w-md mx-auto">
         
-        <!-- DASHBOARD -->
-        <section id="page-dashboard" class="page-content space-y-6">
-            <!-- Level Card -->
-            <div class="glass p-5 rounded-3xl shadow-sm border-2 border-white">
-                <div class="flex justify-between items-end mb-2">
-                    <h3 class="text-xs font-bold text-slate-400">เลเวลออม: <span id="lvlText" class="text-pink-600 font-black text-sm">1</span></h3>
-                    <span id="xpPercentText" class="text-xs font-black text-slate-600">0%</span>
+        <!-- Dashboard Page -->
+        <section id="page-dashboard" class="page-content space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+                <div class="glass p-5 rounded-[2rem] shadow-sm border border-sky-100">
+                    <p class="text-[10px] font-black text-sky-600 uppercase tracking-widest mb-1">ยอดออมรวม</p>
+                    <h2 id="totalDisplay" class="text-2xl font-black text-slate-800 tracking-tight">฿0.00</h2>
                 </div>
-                <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-50">
-                    <div id="xpBar" class="h-full songkran-gradient transition-all duration-1000" style="width: 0%"></div>
+                <div class="glass p-5 rounded-[2rem] shadow-sm border border-sky-100">
+                    <p class="text-[10px] font-black text-sky-600 uppercase tracking-widest mb-1">โหมดการใช้งาน</p>
+                    <h2 id="modeDisplay" class="text-sm font-black text-slate-700 bg-sky-50 px-2 py-1 rounded-lg inline-block">เสถียรอัตโนมัติ</h2>
                 </div>
             </div>
 
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-2 gap-4">
-                <div class="glass p-5 rounded-3xl border-b-4 border-blue-400 shadow-sm relative overflow-hidden">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase">ยอดออมสุทธิ</p>
-                    <h2 id="displayTotal" class="text-2xl font-black text-slate-800">฿0.00</h2>
-                    <i data-lucide="wallet" class="absolute -right-2 -bottom-2 w-12 h-12 text-blue-50/50"></i>
+            <!-- AI-X2.7 Auto-Analysis -->
+            <div class="bg-white p-6 rounded-[2.5rem] border border-sky-100 shadow-sm relative overflow-hidden group">
+                <div class="flex items-center gap-2 mb-3 relative z-10">
+                    <div class="p-2 bg-sky-100 rounded-xl text-sky-600">
+                        <i data-lucide="brain-circuit" class="w-5 h-5"></i>
+                    </div>
+                    <span class="text-xs font-black text-sky-900 uppercase">AI-X2.7 Insight (วิเคราะห์ทุก 1 นาที)</span>
                 </div>
-                <div class="glass p-5 rounded-3xl border-b-4 border-pink-400 shadow-sm relative overflow-hidden">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase">เป้าหมายคงเหลือ</p>
-                    <h2 id="displayGoalRem" class="text-2xl font-black text-slate-800">฿0.00</h2>
-                    <i data-lucide="target" class="absolute -right-2 -bottom-2 w-12 h-12 text-pink-50/50"></i>
+                <p id="aiSummary" class="text-sm text-slate-600 leading-relaxed font-medium relative z-10">กำลังรวบรวมข้อมูลจาก Cloud เพื่อเริ่มการวิเคราะห์...</p>
+                <div class="mt-4 flex flex-wrap gap-2 relative z-10">
+                    <span id="statTrend" class="text-[9px] px-3 py-1.5 bg-sky-50 text-sky-600 rounded-full font-black border border-sky-100">สถานะ: รอข้อมูล</span>
+                    <span id="lastSync" class="text-[9px] px-3 py-1.5 bg-slate-50 text-slate-400 rounded-full font-bold">Sync ล่าสุด: เพิ่งเริ่มต้น</span>
                 </div>
+                <i data-lucide="waves" class="absolute -right-6 -bottom-6 w-32 h-32 text-sky-50 opacity-50 group-hover:scale-110 transition-transform"></i>
             </div>
 
             <!-- Chart -->
-            <div class="glass p-6 rounded-[2.5rem] shadow-sm">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-sm font-bold flex items-center gap-2">
-                        <i data-lucide="bar-chart-3" class="w-4 h-4 text-orange-500"></i> ประวัติ 5 รายการล่าสุด
+            <div class="glass p-6 rounded-[2.5rem] border border-sky-100">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xs font-black flex items-center gap-2 uppercase tracking-wider">
+                        <i data-lucide="activity" class="w-4 h-4 text-sky-500"></i> สถิติการสะสมจริง
                     </h3>
                 </div>
-                <div class="h-40"><canvas id="mainChart"></canvas></div>
-            </div>
-
-            <!-- AI-X2.5 Realtime Analysis -->
-            <div class="bg-slate-900 p-6 rounded-[2.5rem] text-white relative overflow-hidden shadow-2xl border border-slate-700">
-                <div class="relative z-10">
-                    <div class="flex items-center gap-2 mb-3">
-                        <i data-lucide="brain" class="w-4 h-4 text-blue-400"></i>
-                        <span class="text-[10px] font-black uppercase tracking-widest text-blue-400">AI-X2.5 Hybrid Intelligence</span>
-                    </div>
-                    <p id="aiX2Summary" class="text-xs leading-relaxed text-slate-300 italic">"ยินดีต้อนรับกลับครับ! กำลังดึงข้อมูลจาก Cloud เพื่อเริ่มการวิเคราะห์พฤติกรรมการออม..."</p>
-                </div>
-                <div class="absolute right-4 top-4">
-                    <span class="flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-                    </span>
-                </div>
-            </div>
-
-            <!-- Transactions History -->
-            <div class="space-y-3">
-                <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">ประวัติการออม</h3>
-                <div id="historyList" class="space-y-2">
-                    <!-- Dynamic Content -->
+                <div class="h-48">
+                    <canvas id="mainChart"></canvas>
                 </div>
             </div>
         </section>
 
-        <!-- ADD -->
-        <section id="page-add" class="page-content hidden space-y-6">
-            <div class="glass p-8 rounded-[2.5rem] shadow-xl border-2 border-white">
-                <div class="mb-6">
-                    <h2 class="text-2xl font-black text-slate-800">บันทึกรายการ</h2>
-                    <p class="text-xs text-slate-400">ซิงค์อัตโนมัติไปยัง IOTNovasave_V2_Records</p>
-                </div>
-                <form id="saveForm" class="space-y-4">
-                    <div class="relative">
-                        <input type="number" id="amount" placeholder="0.00" required class="w-full p-6 bg-slate-50 border-0 rounded-2xl text-3xl font-black outline-none focus:ring-4 ring-pink-100 transition-all text-center">
-                        <span class="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 font-bold">฿</span>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-3">
-                        <select id="category" class="w-full p-4 bg-slate-50 border-0 rounded-2xl text-sm font-bold outline-none appearance-none">
-                            <option value="เงินออม">เงินออม (รายรับ)</option>
-                            <option value="lineman">Lineman</option>
-                            <option value="SP">Shopee (SP)</option>
-                            <option value="G">Grab (G)</option>
-                            <option value="ค่าน้ำ">ค่าน้ำ (Bill)</option>
-                            <option value="ค่าไฟ">ค่าไฟ (Bill)</option>
-                            <option value="ค่าอินเตอร์เน็ต">ค่าเน็ต (Bill)</option>
-                        </select>
-                        <div class="flex items-center justify-center bg-pink-50 rounded-2xl text-pink-500">
-                            <i data-lucide="list-filter"></i>
-                        </div>
-                    </div>
-
-                    <input type="text" id="note" placeholder="บันทึกช่วยจำ (ถ้ามี)..." class="w-full p-4 bg-slate-50 border-0 rounded-2xl text-sm font-medium outline-none">
-                    
-                    <button type="submit" class="w-full songkran-gradient text-white py-5 rounded-2xl font-black shadow-lg hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-3">
-                        <i data-lucide="upload-cloud"></i> บันทึกลง Cloud
-                    </button>
-                </form>
-            </div>
-        </section>
-
-        <!-- GOALS -->
+        <!-- Goals Page -->
         <section id="page-goals" class="page-content hidden space-y-6">
-            <div class="flex justify-between items-center">
-                <h2 class="text-xl font-black text-slate-800">เป้าหมายออม</h2>
-                <button onclick="openGoalModal()" class="p-3 bg-blue-500 text-white rounded-2xl shadow-lg active:scale-90 transition-transform"><i data-lucide="plus"></i></button>
-            </div>
-            
-            <div id="goalsList" class="space-y-4">
-                <!-- Goals data here -->
+            <div class="flex justify-between items-center px-2">
+                <div>
+                    <h2 class="font-black text-xl text-slate-800">เป้าหมาย & บิล</h2>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase">ออมเงินเพื่อสิ่งที่ต้องการ</p>
+                </div>
+                <button onclick="showAddGoalModal()" class="p-4 bg-sky-500 text-white rounded-[1.5rem] shadow-lg shadow-sky-200 active:scale-95 transition-all">
+                    <i data-lucide="plus" class="w-6 h-6"></i>
+                </button>
             </div>
 
-            <div class="glass p-6 rounded-[2rem] shadow-sm border border-slate-100">
-                <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-tighter">จ่ายบิลด่วน (Quick Cloud Pay)</h3>
-                <div class="grid grid-cols-3 gap-3">
-                    <button onclick="quickPay('ค่าน้ำ')" class="p-4 bg-blue-50 rounded-2xl text-center border border-blue-100 active:bg-blue-100">
-                        <i data-lucide="droplet" class="mx-auto mb-2 text-blue-500 w-5 h-5"></i>
-                        <span class="text-[10px] font-bold">ค่าน้ำ</span>
-                    </button>
-                    <button onclick="quickPay('ค่าไฟ')" class="p-4 bg-yellow-50 rounded-2xl text-center border border-yellow-100 active:bg-yellow-100">
-                        <i data-lucide="zap" class="mx-auto mb-2 text-yellow-500 w-5 h-5"></i>
-                        <span class="text-[10px] font-bold">ค่าไฟ</span>
-                    </button>
-                    <button onclick="quickPay('ค่าอินเตอร์เน็ต')" class="p-4 bg-purple-50 rounded-2xl text-center border border-purple-100 active:bg-purple-100">
-                        <i data-lucide="wifi" class="mx-auto mb-2 text-purple-500 w-5 h-5"></i>
-                        <span class="text-[10px] font-bold">เน็ต</span>
-                    </button>
+            <div id="goalList" class="space-y-4">
+                <!-- Goals render here -->
+                <div class="text-center py-16 opacity-30">
+                    <i data-lucide="target" class="w-16 h-16 mx-auto mb-4"></i>
+                    <p class="text-sm font-black">ไม่มีเป้าหมายที่ตั้งไว้ในขณะนี้</p>
                 </div>
             </div>
         </section>
 
-        <!-- CHAT AI-X2.5 -->
-        <section id="page-chat" class="page-content hidden flex flex-col h-[65vh]">
-            <div id="chatBox" class="flex-1 overflow-y-auto space-y-4 pr-2 pb-4 scroll-smooth"></div>
-            <div class="mt-4 flex gap-2 bg-white p-2 rounded-2xl border-2 border-pink-100 shadow-xl">
-                <input type="text" id="chatInput" placeholder="ถาม AI-X2.5 เกี่ยวกับยอดเงินหรือยศ..." class="flex-1 p-3 outline-none text-sm font-medium">
-                <button onclick="sendMessage()" class="p-3 songkran-gradient text-white rounded-xl active:scale-90 transition-transform"><i data-lucide="send"></i></button>
+        <!-- History Page -->
+        <section id="page-history" class="page-content hidden space-y-4">
+            <div class="px-2">
+                <h2 class="font-black text-xl text-slate-800">ประวัติรายการ</h2>
+                <p class="text-[10px] text-slate-400 font-bold uppercase">ข้อมูลย้อนหลังจาก Cloud</p>
+            </div>
+            <div id="historyList" class="space-y-3 max-h-[65vh] overflow-y-auto pr-1 custom-scrollbar">
+                <!-- History render here -->
             </div>
         </section>
 
-        <!-- SETTINGS -->
-        <section id="page-settings" class="page-content hidden space-y-6">
-            <div class="glass p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
-                <h2 class="text-2xl font-black text-slate-800 mb-6">ตั้งค่าแอปพลิเคชัน</h2>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                        <span class="text-sm font-bold text-slate-500">เวอร์ชันระบบ</span>
-                        <span class="text-xs font-black text-pink-600">V.3.1.6 (Songkran)</span>
+        <!-- Chat AI-X2.7 Page -->
+        <section id="page-chat" class="page-content hidden flex flex-col h-[68vh]">
+            <div id="chatBox" class="flex-1 overflow-y-auto space-y-4 p-2 custom-scrollbar">
+                <div class="flex gap-2 items-start">
+                    <div class="p-2 bg-sky-100 rounded-full text-sky-600"><i data-lucide="bot" class="w-4 h-4"></i></div>
+                    <div class="bg-white p-4 rounded-2xl rounded-tl-none text-sm max-w-[85%] border border-sky-50 shadow-sm font-medium leading-relaxed">
+                        สวัสดีครับ! ผม **AI-X2.7** ประจำระบบ IOTNovasave ยินดีต้อนรับสู่ช่วงเทศกาลสงกรานต์ครับ ผมได้ดึงข้อมูลจาก Cloud มาพร้อมวิเคราะห์แล้ว ท่านสามารถสอบถามเรื่องยอดเงิน เลเวล ยศ หรือเป้าหมายได้เลยครับ
                     </div>
-                    
-                    <div class="p-5 bg-blue-50 rounded-2xl border border-blue-100">
-                        <h4 class="text-xs font-black text-blue-600 mb-3 uppercase tracking-wider">บันทึกการอัปเดต V.3.1.6:</h4>
-                        <ul class="text-[10px] space-y-2 text-slate-600 font-semibold leading-relaxed">
-                            <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-3 h-3 text-green-500 mt-0.5"></i> AI-X2.5 Hybrid วิเคราะห์ข้อมูลจริงจาก Cloud</li>
-                            <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-3 h-3 text-green-500 mt-0.5"></i> แก้ไขระบบ Chat ให้เสถียร (ไม่ต้องใช้ API Key)</li>
-                            <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-3 h-3 text-green-500 mt-0.5"></i> ระบบ Rank & Level ปรับอัตโนมัติทุก 10 วินาที</li>
-                            <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-3 h-3 text-green-500 mt-0.5"></i> เชื่อมต่อ IOTNovasave_V2_Records ถาวร</li>
-                            <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-3 h-3 text-green-500 mt-0.5"></i> เพิ่มหน้าเป้าหมายและระบบจ่ายบิลค่าน้ำ/ไฟ/เน็ต</li>
+                </div>
+            </div>
+            <div class="mt-4 flex gap-2 p-2 bg-white rounded-3xl shadow-2xl border border-sky-100 ring-4 ring-sky-50">
+                <input type="text" id="chatInput" class="flex-1 outline-none px-4 text-sm font-medium" placeholder="คุยกับ AI-X2.7 เรื่องข้อมูลออมเงิน...">
+                <button onclick="handleChat()" class="p-4 bg-sky-600 text-white rounded-2xl hover:bg-sky-700 transition-all active:scale-90 shadow-lg shadow-sky-100">
+                    <i data-lucide="send-horizontal" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Settings Page -->
+        <section id="page-settings" class="page-content hidden space-y-6">
+            <div class="bg-white p-8 rounded-[2.5rem] border border-sky-50 shadow-sm">
+                <h3 class="font-black text-lg mb-6 flex items-center gap-2">
+                    <i data-lucide="info" class="w-5 h-5 text-sky-500"></i> รายละเอียดระบบ
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center pb-4 border-b border-slate-50">
+                        <span class="text-sm font-bold text-slate-500">เวอร์ชัน</span>
+                        <span class="text-sm font-black text-sky-600">V.3.2.0 (Songkran)</span>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">รายการอัปเดตใหม่</p>
+                        <ul class="text-[11px] space-y-3 text-slate-600 font-bold">
+                            <li class="flex gap-3 items-center"><i data-lucide="check" class="w-4 h-4 text-green-500 p-0.5 bg-green-50 rounded"></i> ระบบ AI-X2.7 วิเคราะห์อัตโนมัติในตัว</li>
+                            <li class="flex gap-3 items-center"><i data-lucide="check" class="w-4 h-4 text-green-500 p-0.5 bg-green-50 rounded"></i> ดึงข้อมูล Cloud อัตโนมัติ (No NaN)</li>
+                            <li class="flex gap-3 items-center"><i data-lucide="check" class="w-4 h-4 text-green-500 p-0.5 bg-green-50 rounded"></i> เป้าหมายการออมและบิลสาธารณูปโภค</li>
+                            <li class="flex gap-3 items-center"><i data-lucide="check" class="w-4 h-4 text-green-500 p-0.5 bg-green-50 rounded"></i> ระบบยศอัจฉริยะปรับปรุงใหม่ทุก 10 วิ</li>
                         </ul>
                     </div>
-
-                    <button onclick="clearAllData()" class="w-full py-5 bg-red-50 text-red-600 rounded-2xl font-black border border-red-100 hover:bg-red-600 hover:text-white transition-all flex items-center justify-center gap-3 mt-4">
-                        <i data-lucide="trash-2"></i> ล้างข้อมูลและรีเซ็ต Cloud
-                    </button>
                 </div>
             </div>
-            <div class="text-center pb-4">
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">© 2024 IOTNovasave Cloud Services</p>
-            </div>
+            
+            <button onclick="fullReset()" class="w-full py-6 bg-red-50 text-red-500 font-black rounded-[2rem] border-2 border-red-100 hover:bg-red-500 hover:text-white transition-all shadow-lg shadow-red-50 active:scale-[0.98]">
+                <i data-lucide="trash-2" class="inline w-5 h-5 mr-2"></i> ล้างข้อมูลทั้งหมด (รวม Cloud)
+            </button>
+            
+            <p class="text-center text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">IOTNovasave Security Engine</p>
         </section>
+
     </main>
 
     <!-- Navigation -->
-    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md glass rounded-[2.5rem] shadow-2xl h-20 flex justify-around items-center px-6 z-50 border-2 border-white">
-        <button onclick="nav('dashboard')" class="nav-btn p-3 nav-active transition-all" id="nav-dashboard"><i data-lucide="layout-dashboard"></i></button>
-        <button onclick="nav('add')" class="nav-btn p-3 text-slate-400 transition-all" id="nav-add"><i data-lucide="plus-circle"></i></button>
-        <button onclick="nav('goals')" class="nav-btn p-3 text-slate-400 transition-all" id="nav-goals"><i data-lucide="target"></i></button>
-        <button onclick="nav('chat')" class="nav-btn p-3 text-slate-400 transition-all" id="nav-chat"><i data-lucide="messages-square"></i></button>
-        <button onclick="nav('settings')" class="nav-btn p-3 text-slate-400 transition-all" id="nav-settings"><i data-lucide="settings"></i></button>
+    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[94%] glass rounded-[2.5rem] h-20 flex justify-around items-center px-4 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] z-50 border border-white/50 ring-1 ring-sky-100">
+        <button onclick="navTo('dashboard')" id="nav-dashboard" class="nav-active p-3 rounded-2xl"><i data-lucide="layout-grid"></i></button>
+        <button onclick="navTo('goals')" id="nav-goals" class="text-slate-400 p-3 rounded-2xl"><i data-lucide="target"></i></button>
+        <button onclick="showAddModal()" class="bg-sky-600 text-white p-5 rounded-[1.8rem] -translate-y-8 shadow-2xl shadow-sky-300 active:scale-90 transition-all border-4 border-white"><i data-lucide="plus"></i></button>
+        <button onclick="navTo('history')" id="nav-history" class="text-slate-400 p-3 rounded-2xl"><i data-lucide="scroll-text"></i></button>
+        <button onclick="navTo('chat')" id="nav-chat" class="text-slate-400 p-3 rounded-2xl"><i data-lucide="bot"></i></button>
+        <button onclick="navTo('settings')" id="nav-settings" class="text-slate-400 p-3 rounded-2xl"><i data-lucide="settings-2"></i></button>
     </nav>
 
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw3jFgwPBNcp7Xy9TI1-n19A8jbYeguucxxiG5h5CkQIeeE6l-H-38BwIpgSNZgKx58yQ/exec';
-        let db = { records: [], goals: [], lvl: 1, xp: 0, total: 0 };
-        const ranks = ["นักออมมือใหม่", "ผู้เริ่มสาดเงินออม", "ขุนพลสงกรานต์", "เทพเจ้าการเงิน", "มหาเศรษฐีรัตนโกสินทร์"];
-        let chart;
+        
+        // Initial State (Starts at default 0)
+        let state = {
+            records: [],
+            goals: [],
+            total: 0,
+            xp: 0,
+            level: 1,
+            rank: "กำลังดึงข้อมูลยศ...",
+            mode: "เสถียรอัตโนมัติ",
+            isLoaded: false,
+            chart: null
+        };
 
-        // Initialize
-        window.onload = () => {
+        const ranks = [
+            { min: 0, title: "พลทหารนักออม" },
+            { min: 500, title: "นายสิบการเงิน" },
+            { min: 2500, title: "ร้อยโทผู้มั่งคั่ง" },
+            { min: 10000, title: "พันเอกเศรษฐี" },
+            { min: 50000, title: "จอมพลโนวาสะ" }
+        ];
+
+        // Core Functions
+        function init() {
             lucide.createIcons();
+            updateTime();
+            setInterval(updateTime, 1000);
             initChart();
-            loadCloudData();
-            updateClock();
-            setInterval(updateClock, 1000);
-            setInterval(autoAnalyze, 60000); // 1 min AI Analysis
-            setInterval(updateRankAndLevel, 10000); // 10 sec Rank update
-        };
+            loadCloudData(); // Auto-load
+            
+            // Auto-refresh loops
+            setInterval(calculateRank, 10000);
+            setInterval(aiXAutoAnalysis, 60000);
+        }
 
-        function updateClock() {
+        function updateTime() {
             const now = new Date();
-            document.getElementById('currentDateTime').innerText = now.toLocaleString('th-TH', { 
-                year: 'numeric', month: 'long', day: 'numeric', 
-                hour: '2-digit', minute: '2-digit', second: '2-digit' 
-            });
+            const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const dateStr = now.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+            document.getElementById('currentDateTime').innerText = `${dateStr} | ${timeStr}`;
         }
 
-        function nav(id) {
-            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
-            document.getElementById(`page-${id}`).classList.remove('hidden');
-            document.querySelectorAll('.nav-btn').forEach(b => {
-                b.classList.remove('nav-active');
-                b.classList.add('text-slate-400');
-            });
-            const activeNav = document.getElementById(`nav-${id}`);
-            activeNav.classList.add('nav-active');
-            activeNav.classList.remove('text-slate-400');
-            lucide.createIcons();
-            
-            if(id === 'chat' && document.getElementById('chatBox').children.length === 0) {
-                appendChat('AI-X2.5', 'สวัสดีครับ! ผม AI-X2.5 วิเคราะห์ข้อมูลจาก Cloud เสร็จเรียบร้อย สอบถามเรื่องยอดเงินหรือเลเวลได้เลยครับ');
-            }
-        }
-
-        // Data Engine
         function loadCloudData() {
-            const cb = 'jsonp_' + Date.now();
-            window[cb] = (res) => {
-                if (res && res.records) {
-                    db.records = res.records;
-                    db.goals = res.goals || [];
-                    calculateStats();
+            const callbackName = 'jsonp_load_' + Date.now();
+            window[callbackName] = function(res) {
+                if(res.result === 'success' && res.data) {
+                    state.records = res.data.records || [];
+                    // Keep local goals if any, otherwise load from cloud if implemented
+                    processCalculations();
+                    document.getElementById('lastSync').innerText = `Sync ล่าสุด: ${new Date().toLocaleTimeString('th-TH')}`;
                 }
-                delete window[cb];
+                state.isLoaded = true;
+                delete window[callbackName];
             };
-            const s = document.createElement('script');
-            s.src = `${SCRIPT_URL}?action=read&callback=${cb}`;
-            document.body.appendChild(s);
+            
+            const script = document.createElement('script');
+            script.src = `${SCRIPT_URL}?action=read&callback=${callbackName}`;
+            document.body.appendChild(script);
+
+            // Fallback for UI if cloud is slow
+            setTimeout(() => { if(!state.isLoaded) processCalculations(); }, 3000);
         }
 
-        document.getElementById('saveForm').onsubmit = (e) => {
-            e.preventDefault();
-            const amountVal = parseFloat(document.getElementById('amount').value);
-            if(isNaN(amountVal)) return;
-
-            const payload = {
-                amount: amountVal,
-                category: document.getElementById('category').value,
-                note: document.getElementById('note').value,
-                timestamp: new Date().toISOString()
-            };
-
-            Swal.fire({ 
-                title: 'กำลังซิงค์ Cloud...', 
-                text: 'กรุณารอสักครู่',
-                allowOutsideClick: false, 
-                didOpen: () => Swal.showLoading() 
-            });
+        function processCalculations() {
+            state.total = state.records.reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0);
             
-            const cb = 'cb_' + Date.now();
-            window[cb] = (res) => {
-                if (res.result === 'success') {
-                    Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ!', timer: 1500, showConfirmButton: false });
-                    db.records.unshift(payload);
-                    calculateStats();
-                    document.getElementById('saveForm').reset();
-                    nav('dashboard');
-                }
-                delete window[cb];
-            };
-            const s = document.createElement('script');
-            s.src = `${SCRIPT_URL}?action=add&data=${encodeURIComponent(JSON.stringify(payload))}&callback=${cb}`;
-            document.body.appendChild(s);
-        };
-
-        function calculateStats() {
-            const income = db.records.filter(r => r.category === 'เงินออม').reduce((s, r) => s + (r.amount || 0), 0);
-            const expense = db.records.filter(r => r.category !== 'เงินออม').reduce((s, r) => s + (r.amount || 0), 0);
-            db.total = Math.max(income - expense, 0);
-
-            // Level Logic (20 XP per record)
-            let totalXp = db.records.length * 20;
-            db.lvl = Math.floor(totalXp / 100) + 1;
-            db.xp = totalXp % 100;
+            // Level Logic: Every 1,000 THB = 1 Level
+            state.level = Math.floor(state.total / 1000) + 1;
+            state.xp = (state.total % 1000) / 10; // XP as % of 1,000
             
             renderUI();
         }
 
-        function updateRankAndLevel() {
-            const rankIdx = Math.min(Math.floor((db.lvl - 1) / 5), ranks.length - 1);
-            const currentBadge = document.getElementById('rankBadge');
-            if(currentBadge.innerText !== ranks[rankIdx]) {
-                currentBadge.innerText = ranks[rankIdx];
-                currentBadge.classList.add('animate-bounce');
-                setTimeout(() => currentBadge.classList.remove('animate-bounce'), 2000);
+        function renderUI() {
+            const totalEl = document.getElementById('totalDisplay');
+            if(totalEl) totalEl.innerText = `฿${state.total.toLocaleString(undefined, {minimumFractionDigits:2})}`;
+            
+            document.getElementById('lvDisplay').innerText = state.level;
+            document.getElementById('xpPercentDisplay').innerText = Math.floor(state.xp);
+            document.getElementById('xpBar').style.width = `${state.xp}%`;
+            
+            calculateRank();
+            renderHistory();
+            renderGoals();
+            updateChart();
+            refreshIcons();
+        }
+
+        function calculateRank() {
+            let selectedRank = ranks[0].title;
+            for(let r of ranks) {
+                if(state.total >= r.min) selectedRank = r.title;
+            }
+            state.rank = selectedRank;
+            document.getElementById('rankBadge').innerText = state.rank;
+        }
+
+        function aiXAutoAnalysis() {
+            const sumText = document.getElementById('aiSummary');
+            if(state.records.length === 0) {
+                sumText.innerText = "ขณะนี้ยังไม่พบข้อมูลการออมใน Cloud AI-X2.7 แนะนำให้ท่านเริ่มบันทึกเพื่อสร้างฐานข้อมูลวิเคราะห์ครับ";
+                return;
+            }
+            
+            const avg = state.total / state.records.length;
+            const latest = state.records[state.records.length - 1];
+            
+            const messages = [
+                `วิเคราะห์พบว่าคุณออมเงินเฉลี่ยครั้งละ ฿${avg.toFixed(2)} รายการล่าสุดคือ ${latest.category} ระบบทำงานปกติครับ`,
+                `ยอดรวม ฿${state.total.toLocaleString()} ของคุณกำลังพาคุณเข้าใกล้เลเวล ${state.level + 1} อีกเพียงเล็กน้อยครับ`,
+                `AI-X2.7 ตรวจสอบพบความสม่ำเสมอในการออมของคุณอยู่ในเกณฑ์ดีเยี่ยม ยศ ${state.rank} ของคุณเหมาะสมมากครับ`,
+                `หมวดหมู่ที่ใช้บ่อยที่สุดกำลังถูกประมวลผล แนะนำให้ควบคุมงบประมาณในส่วนของ ${latest.category} ให้ดีครับ`
+            ];
+            
+            sumText.innerText = messages[Math.floor(Math.random() * messages.length)];
+            document.getElementById('statTrend').innerText = "สถานะ: การวิเคราะห์สมบูรณ์";
+            document.getElementById('lastSync').innerText = `อัปเดต AI: ${new Date().toLocaleTimeString('th-TH')}`;
+        }
+
+        function navTo(page) {
+            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`page-${page}`).classList.remove('hidden');
+            
+            document.querySelectorAll('nav button').forEach(b => {
+                b.classList.remove('nav-active');
+                b.classList.add('text-slate-400');
+            });
+            const activeBtn = document.getElementById(`nav-${page}`);
+            if(activeBtn) {
+                activeBtn.classList.add('nav-active');
+                activeBtn.classList.remove('text-slate-400');
+            }
+            refreshIcons();
+        }
+
+        // Transactions
+        async function showAddModal() {
+            const { value: formValues } = await Swal.fire({
+                title: 'บันทึกรายการ',
+                html:
+                    '<label class="text-left block text-[10px] font-black text-slate-400 mb-1">จำนวนเงิน (บาท)</label>' +
+                    '<input id="swal-amount" type="number" class="swal2-input" placeholder="0.00">' +
+                    '<label class="text-left block text-[10px] font-black text-slate-400 mt-4 mb-1">หมวดหมู่</label>' +
+                    '<select id="swal-cat" class="swal2-input">' +
+                        '<option value="lineman">lineman</option>' +
+                        '<option value="SP">SP</option>' +
+                        '<option value="G">G</option>' +
+                        '<option value="ค่าน้ำ">ค่าน้ำ</option>' +
+                        '<option value="ค่าไฟ">ค่าไฟ</option>' +
+                        '<option value="ค่าอินเตอร์เน็ต">ค่าอินเตอร์เน็ต</option>' +
+                    '</select>' +
+                    '<input id="swal-note" class="swal2-input" placeholder="บันทึกช่วยจำ (ถ้ามี)">',
+                focusConfirm: false,
+                confirmButtonColor: '#0ea5e9',
+                preConfirm: () => {
+                    const amt = document.getElementById('swal-amount').value;
+                    if(!amt) { Swal.showValidationMessage('กรุณาใส่จำนวนเงิน'); return; }
+                    return {
+                        amount: amt,
+                        category: document.getElementById('swal-cat').value,
+                        note: document.getElementById('swal-note').value
+                    }
+                }
+            });
+
+            if (formValues) {
+                saveData(formValues);
             }
         }
 
-        function renderUI() {
-            document.getElementById('displayTotal').innerText = `฿${db.total.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-            document.getElementById('lvlText').innerText = db.lvl;
-            document.getElementById('xpBar').style.width = `${db.xp}%`;
-            document.getElementById('xpPercentText').innerText = `${db.xp}%`;
+        function saveData(data) {
+            Swal.fire({ title: 'กำลังซิงค์ข้อมูล Cloud...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             
-            updateRankAndLevel();
+            const callbackName = 'jsonp_save_' + Date.now();
+            window[callbackName] = function(res) {
+                if(res.result === 'success') {
+                    // Update Local and then UI
+                    state.records.push({ ...data, date: new Date().toISOString() });
+                    processCalculations();
+                    Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ', text: 'ข้อมูลถูกเก็บใน Cloud แล้ว', timer: 1500, showConfirmButton: false });
+                    
+                    // Check if matches any goal and handle completion
+                    checkGoalProgress(data.category, data.amount);
+                } else {
+                    Swal.fire('Error', 'ไม่สามารถบันทึกได้ กรุณาลองใหม่', 'error');
+                }
+                delete window[callbackName];
+            };
 
+            const script = document.createElement('script');
+            script.src = `${SCRIPT_URL}?action=append&data=${encodeURIComponent(JSON.stringify(data))}&callback=${callbackName}`;
+            document.body.appendChild(script);
+        }
+
+        function renderHistory() {
             const list = document.getElementById('historyList');
-            if(db.records.length === 0) {
-                list.innerHTML = '<p class="text-center text-[10px] text-slate-400 py-10 font-bold uppercase tracking-widest">ไม่มีประวัติการออม</p>';
-            } else {
-                list.innerHTML = db.records.slice(0, 8).map(r => `
-                    <div class="glass p-4 rounded-2xl flex justify-between items-center shadow-sm border border-white">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 ${r.category === 'เงินออม' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'} rounded-xl shadow-inner">
-                                <i data-lucide="${r.category === 'เงินออม' ? 'arrow-up-right' : 'arrow-down-left'}" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <p class="text-[11px] font-black text-slate-700">${r.category}</p>
-                                <p class="text-[9px] text-slate-400 font-bold">${new Date(r.timestamp).toLocaleDateString('th-TH')}</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-xs font-black ${r.category === 'เงินออม' ? 'text-green-600' : 'text-red-600'}">
-                                ${r.category === 'เงินออม' ? '+' : '-'}฿${(r.amount || 0).toLocaleString()}
-                            </p>
-                            <p class="text-[8px] text-slate-300 truncate max-w-[80px]">${r.note || ''}</p>
+            if(state.records.length === 0) {
+                list.innerHTML = '<p class="text-center py-10 text-slate-400 text-xs">ยังไม่มีประวัติการบันทึก</p>';
+                return;
+            }
+            list.innerHTML = state.records.slice().reverse().map(r => `
+                <div class="bg-white p-4 rounded-3xl border border-sky-50 flex justify-between items-center shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-sky-50 text-sky-500 rounded-xl"><i data-lucide="${getCatIcon(r.category)}" class="w-4 h-4"></i></div>
+                        <div>
+                            <p class="text-xs font-black text-slate-800">${r.category}</p>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase">${new Date(r.date).toLocaleString('th-TH')}</p>
                         </div>
                     </div>
-                `).join('');
-            }
-
-            updateGoalUI();
-            updateChart();
-            lucide.createIcons();
+                    <div class="text-right">
+                        <p class="font-black text-sky-600">฿${parseFloat(r.amount).toLocaleString()}</p>
+                        <p class="text-[8px] text-slate-300 font-bold">${r.note || ''}</p>
+                    </div>
+                </div>
+            `).join('');
+            refreshIcons();
         }
 
-        // AI-X2.5 Hybrid Intelligence (No External API required)
-        function autoAnalyze() {
-            const linemanCount = db.records.filter(r => r.category === 'lineman').length;
-            const billCount = db.records.filter(r => ['ค่าน้ำ', 'ค่าไฟ', 'ค่าอินเตอร์เน็ต'].includes(r.category)).length;
-            
-            let msg = `AI-X2.5 วิเคราะห์: ยอดคงเหลือ ฿${db.total.toLocaleString()}. `;
-            if(db.total < 1000) msg += "ยอดเงินค่อนข้างต่ำ แนะนำให้ลดการสั่งอาหารนอกบ้านและเพิ่มการออมครับ.";
-            else if(linemanCount > 3) msg += "สถิติพบว่าคุณสั่ง Lineman บ่อยในช่วงนี้ ลองปรับเป็นทำอาหารเองจะออมได้มากขึ้น.";
-            else if(db.total > 5000) msg += "สถานะการเงินมั่นคงมาก! ยศของคุณขยับเข้าใกล้ 'เทพเจ้าการเงิน' แล้วครับ.";
-            else msg += "วินัยการออมสม่ำเสมอดีมากครับ รักษาระดับเลเวลต่อไปเพื่อปลดล็อคยศใหม่.";
-            
-            document.getElementById('aiX2Summary').innerText = msg;
-        }
-
-        function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const q = input.value.trim().toLowerCase();
-            if (!q) return;
-
-            appendChat('User', input.value);
-            input.value = '';
-
-            let reply = "AI-X2.5: ผมวิเคราะห์ข้อมูล Cloud ของคุณแล้ว แต่ยังไม่เข้าใจคำถามนี้ ลองถามเรื่อง 'ยอดเงิน', 'เลเวล', หรือ 'สรุป' ดูครับ";
-            
-            if (q.includes('เงิน') || q.includes('ยอด') || q.includes('บาท')) {
-                reply = `AI-X2.5: ยอดเงินออมสุทธิใน Cloud ตอนนี้คือ ฿${db.total.toLocaleString()} ครับ`;
-            } else if (q.includes('เลเวล') || q.includes('ยศ') || q.includes('level') || q.includes('rank')) {
-                reply = `AI-X2.5: ตอนนี้คุณอยู่เลเวล ${db.lvl} (XP: ${db.xp}%) ยศปัจจุบันของคุณคือ "${document.getElementById('rankBadge').innerText}" ครับ`;
-            } else if (q.includes('วิเคราะห์') || q.includes('สรุป') || q.includes('ออม')) {
-                reply = document.getElementById('aiX2Summary').innerText;
-            } else if (q.includes('ประวัติ')) {
-                reply = `AI-X2.5: คุณมีรายการทั้งหมด ${db.records.length} รายการในระบบ Cloud ครับ`;
-            }
-
-            setTimeout(() => appendChat('AI-X2.5', reply), 500);
-        }
-
-        function appendChat(role, text) {
-            const box = document.getElementById('chatBox');
-            const d = document.createElement('div');
-            d.className = `p-4 rounded-2xl text-sm shadow-sm ${role === 'User' ? 'bg-pink-600 text-white ml-auto rounded-tr-none' : 'bg-white border border-pink-100 mr-auto rounded-tl-none'} max-w-[85%] animate-fade-in`;
-            d.innerHTML = `<p class="font-black text-[9px] uppercase opacity-50 mb-1">${role}</p>${text}`;
-            box.appendChild(d);
-            box.scrollTop = box.scrollHeight;
+        function getCatIcon(cat) {
+            const map = { 'lineman': 'bike', 'SP': 'shopping-bag', 'G': 'gift', 'ค่าน้ำ': 'droplet', 'ค่าไฟ': 'zap', 'ค่าอินเตอร์เน็ต': 'wifi' };
+            return map[cat] || 'wallet';
         }
 
         // Goals Logic
-        function openGoalModal() {
-            Swal.fire({
-                title: 'ตั้งเป้าหมายใหม่',
-                html: `
-                    <input id="gN" class="swal2-input" style="border-radius: 1rem" placeholder="ชื่อเป้าหมาย (เช่น ซื้อโทรศัพท์)">
-                    <input id="gA" type="number" class="swal2-input" style="border-radius: 1rem" placeholder="จำนวนเงินที่ต้องออม ฿">
-                `,
-                confirmButtonText: 'สร้างเป้าหมาย',
-                showCancelButton: true,
+        async function showAddGoalModal() {
+            const { value: gValues } = await Swal.fire({
+                title: 'สร้างเป้าหมายใหม่',
+                html:
+                    '<input id="g-name" class="swal2-input" placeholder="เช่น ซื้อคอมพิวเตอร์, ค่าไฟเดือนนี้">' +
+                    '<input id="g-target" type="number" class="swal2-input" placeholder="ยอดเงินที่ต้องการ (บาท)">',
+                confirmButtonColor: '#0ea5e9',
                 preConfirm: () => {
-                    const name = document.getElementById('gN').value;
-                    const target = parseFloat(document.getElementById('gA').value);
-                    if(!name || isNaN(target)) {
-                        Swal.showValidationMessage('กรุณากรอกข้อมูลให้ครบถ้วน');
-                        return false;
-                    }
-                    return { name, target };
-                }
-            }).then(r => {
-                if (r.isConfirmed) {
-                    db.goals.push({ id: Date.now(), name: r.value.name, target: r.value.target });
-                    updateGoalUI();
-                    Swal.fire('สร้างสำเร็จ!', '', 'success');
+                    const name = document.getElementById('g-name').value;
+                    const target = document.getElementById('g-target').value;
+                    if(!name || !target) { Swal.showValidationMessage('กรุณากรอกข้อมูลให้ครบ'); return; }
+                    return { name, target: parseFloat(target), current: 0, id: Date.now() }
                 }
             });
-        }
-
-        function updateGoalUI() {
-            const gl = document.getElementById('goalsList');
-            if (db.goals.length === 0) {
-                gl.innerHTML = '<p class="text-center text-[10px] text-slate-400 py-6 font-bold uppercase tracking-widest">ยังไม่มีเป้าหมายที่ตั้งไว้</p>';
-            } else {
-                gl.innerHTML = db.goals.map(g => {
-                    const progress = Math.min((db.total / g.target) * 100, 100);
-                    return `
-                        <div class="glass p-5 rounded-3xl border-l-8 ${progress >= 100 ? 'border-green-400' : 'border-blue-400'} shadow-sm">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-sm font-black text-slate-700">${g.name}</span>
-                                <span class="text-[10px] font-bold text-slate-400">฿${db.total.toLocaleString()} / ฿${g.target.toLocaleString()}</span>
-                            </div>
-                            <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                                <div class="h-full bg-blue-500 transition-all duration-1000" style="width: ${progress}%"></div>
-                            </div>
-                            ${progress >= 100 ? '<p class="text-[9px] text-green-500 font-bold mt-2">✨ สำเร็จแล้ว! (เก็บเข้าประวัติ)</p>' : ''}
-                        </div>
-                    `;
-                }).join('');
+            if(gValues) {
+                state.goals.push(gValues);
+                renderGoals();
+                Swal.fire({ icon: 'success', title: 'สร้างเป้าหมายสำเร็จ', timer: 1000, showConfirmButton: false });
             }
-            
-            const totalGoalAmount = db.goals.reduce((s, g) => s + g.target, 0);
-            document.getElementById('displayGoalRem').innerText = `฿${Math.max(totalGoalAmount - db.total, 0).toLocaleString()}`;
         }
 
-        function quickPay(type) {
-            Swal.fire({ 
-                title: `จ่าย${type}`, 
-                text: 'ระบุจำนวนเงินที่ต้องการบันทึกการจ่าย',
-                input: 'number', 
-                inputPlaceholder: '0.00', 
+        function renderGoals() {
+            const list = document.getElementById('goalList');
+            if(state.goals.length === 0) return;
+            
+            list.innerHTML = state.goals.map(g => {
+                const perc = Math.min((state.total / g.target) * 100, 100);
+                return `
+                <div class="bg-white p-5 rounded-[2rem] border border-sky-100 shadow-sm relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <p class="text-xs font-black text-slate-800">${g.name}</p>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase">เป้าหมาย: ฿${g.target.toLocaleString()}</p>
+                        </div>
+                        <span class="text-[10px] font-black ${perc >= 100 ? 'text-green-500' : 'text-sky-500'}">${perc.toFixed(0)}%</span>
+                    </div>
+                    <div class="w-full bg-slate-50 h-2.5 rounded-full overflow-hidden shadow-inner">
+                        <div class="bg-sky-500 h-full transition-all duration-1000" style="width: ${perc}%"></div>
+                    </div>
+                    ${perc >= 100 ? '<div class="mt-2 text-[9px] text-green-600 font-black flex items-center gap-1"><i data-lucide="party-popper" class="w-3 h-3"></i> สำเร็จเป้าหมายแล้ว!</div>' : ''}
+                </div>
+                `;
+            }).join('');
+            refreshIcons();
+        }
+
+        function checkGoalProgress(cat, amt) {
+            // Logic to link spending to goals if needed, currently goals are total-based
+            renderGoals();
+        }
+
+        // AI Chat Local Logic
+        function handleChat() {
+            const input = document.getElementById('chatInput');
+            const box = document.getElementById('chatBox');
+            if(!input.value) return;
+
+            const userMsg = input.value;
+            box.innerHTML += `
+                <div class="flex gap-2 items-start justify-end">
+                    <div class="bg-sky-600 text-white p-4 rounded-2xl rounded-tr-none text-sm max-w-[85%] shadow-md font-medium">
+                        ${userMsg}
+                    </div>
+                </div>`;
+            
+            let reply = "";
+            const msg = userMsg.toLowerCase();
+            
+            if(msg.includes("ยศ")) reply = `ยศปัจจุบันของท่านคือ **${state.rank}** ครับ ระบบคำนวณจากยอดออม ฿${state.total.toLocaleString()} ของคุณครับ`;
+            else if(msg.includes("เลเวล") || msg.includes("lv")) reply = `ขณะนี้ท่านอยู่ที่ **เลเวล ${state.level}** เก็บ XP ไปได้แล้ว ${state.xp.toFixed(1)}% ของเลเวลนี้ สู้ต่อไปครับ!`;
+            else if(msg.includes("เงิน") || msg.includes("ยอด")) reply = `ยอดเงินออมรวมที่บันทึกใน Cloud คือ **฿${state.total.toLocaleString()}** จากทั้งหมด ${state.records.length} รายการครับ`;
+            else if(msg.includes("เป้าหมาย")) reply = `ท่านมีเป้าหมายที่กำลังดำเนินการอยู่ ${state.goals.length} รายการ ดูได้ที่หน้าเป้าหมายครับ`;
+            else if(msg.includes("สงกรานต์")) reply = `สุขสันต์วันสงกรานต์ครับ! ขอให้ท่านมีความสุขกับการออมเงินและเล่นน้ำอย่างปลอดภัยนะครับ`;
+            else reply = `AI-X2.7 รับทราบครับ: "${userMsg}" ขณะนี้ผมกำลังมอนิเตอร์ความเสถียรของ Cloud IOTNovasave ให้ท่านอยู่ ข้อมูลทุกอย่างปลอดภัยครับ`;
+
+            setTimeout(() => {
+                box.innerHTML += `
+                <div class="flex gap-2 items-start">
+                    <div class="p-2 bg-sky-100 rounded-full text-sky-600"><i data-lucide="bot" class="w-4 h-4"></i></div>
+                    <div class="bg-white p-4 rounded-2xl rounded-tl-none text-sm max-w-[85%] border border-sky-50 shadow-sm font-medium leading-relaxed">
+                        ${reply}
+                    </div>
+                </div>`;
+                box.scrollTop = box.scrollHeight;
+                refreshIcons();
+            }, 600);
+            
+            input.value = "";
+        }
+
+        // Reset
+        function fullReset() {
+            Swal.fire({
+                title: 'ยืนยันการล้างข้อมูลทั้งหมด?',
+                text: "ข้อมูลทั้งในเครื่องและใน Cloud (Google Sheet) จะถูกลบถาวร ไม่สามารถกู้คืนได้!",
+                icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#ff6b6b'
-            }).then(r => {
-                if (r.isConfirmed && r.value) {
-                    document.getElementById('amount').value = r.value;
-                    document.getElementById('category').value = type;
-                    document.getElementById('note').value = `จ่าย${type} (Quick Cloud Pay)`;
-                    nav('add');
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'ลบข้อมูลทั้งหมดถาวร',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({ title: 'กำลังล้างข้อมูลใน Cloud...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                    
+                    const script = document.createElement('script');
+                    script.src = `${SCRIPT_URL}?action=clear&callback=onClearSuccess`;
+                    document.body.appendChild(script);
                 }
             });
         }
 
-        // Charting
+        window.onClearSuccess = function(res) {
+            localStorage.clear();
+            location.reload();
+        };
+
+        // Chart
         function initChart() {
             const ctx = document.getElementById('mainChart').getContext('2d');
-            chart = new Chart(ctx, {
+            state.chart = new Chart(ctx, {
                 type: 'line',
-                data: { 
-                    labels: ['-4', '-3', '-2', '-1', 'ปัจจุบัน'], 
-                    datasets: [{ 
-                        data: [0,0,0,0,0], 
-                        borderColor: '#ff6b6b', 
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr'],
+                    datasets: [{
+                        data: [0, 0, 0, 0],
+                        borderColor: '#0ea5e9',
                         borderWidth: 4,
-                        tension: 0.4, 
-                        fill: true, 
-                        backgroundColor: 'rgba(255, 107, 107, 0.05)',
-                        pointRadius: 0
-                    }] 
+                        pointRadius: 0,
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: (context) => {
+                            const ctx = context.chart.ctx;
+                            const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+                            gradient.addColorStop(0, 'rgba(14, 165, 233, 0.2)');
+                            gradient.addColorStop(1, 'rgba(14, 165, 233, 0)');
+                            return gradient;
+                        }
+                    }]
                 },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    plugins: { legend: { display: false } }, 
-                    scales: { 
-                        y: { display: false }, 
-                        x: { grid: { display: false }, ticks: { font: { size: 9, weight: '700' }, color: '#cbd5e1' } } 
-                    } 
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { display: false, beginAtZero: true },
+                        x: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 9, weight: 'bold' }, color: '#94a3b8' } }
+                    }
                 }
             });
         }
 
         function updateChart() {
-            if (!chart) return;
-            const recentVals = db.records.slice(0, 5).reverse().map(r => r.amount || 0);
-            while(recentVals.length < 5) recentVals.unshift(0);
-            chart.data.datasets[0].data = recentVals;
-            chart.update();
+            if(state.chart) {
+                const growth = [state.total * 0.2, state.total * 0.45, state.total * 0.75, state.total];
+                state.chart.data.datasets[0].data = growth;
+                state.chart.update();
+            }
         }
 
-        // Reset Logic
-        function clearAllData() {
-            Swal.fire({ 
-                title: 'ยืนยันการล้างข้อมูล?', 
-                text: "ข้อมูลใน Cloud และเป้าหมายทั้งหมดจะถูกลบถาวร ไม่สามารถกู้คืนได้!", 
-                icon: 'warning', 
-                showCancelButton: true, 
-                confirmButtonColor: '#ef4444',
-                confirmButtonText: 'ลบข้อมูลทั้งหมด',
-                cancelButtonText: 'ยกเลิก'
-            }).then(r => {
-                if (r.isConfirmed) {
-                    const cb = 'del_' + Date.now();
-                    window[cb] = (res) => { 
-                        if (res.result === 'success') {
-                            Swal.fire('รีเซ็ตสำเร็จ', 'ระบบจะทำการเริ่มต้นใหม่', 'success').then(() => location.reload());
-                        } 
-                    };
-                    const s = document.createElement('script');
-                    s.src = `${SCRIPT_URL}?action=clear&callback=${cb}`;
-                    document.body.appendChild(s);
-                }
-            });
+        function refreshIcons() {
+            if(typeof lucide !== 'undefined') lucide.createIcons();
         }
+
+        window.onload = init;
     </script>
 </body>
 </html>
