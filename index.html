@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IOTNovasave V.3.1.0 | AI Financial Assistant</title>
+    <title>IOTNovasave V.3.1.1 | AI Financial Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #f1f5f9; color: #0f172a; -webkit-tap-highlight-color: transparent; }
-        .nav-active { color: #2563eb; background-color: #f8fafc; border-bottom: 3px solid #2563eb; }
+        body { font-family: 'Kanit', sans-serif; background-color: #f8fafc; color: #0f172a; -webkit-tap-highlight-color: transparent; }
+        .nav-active { color: #2563eb; background-color: #f1f5f9; border-bottom: 3px solid #2563eb; }
         .glass-card { background: white; border-radius: 1.5rem; border: 1px solid #e2e8f0; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
@@ -33,7 +33,7 @@
         </div>
         <div class="text-right">
             <div id="currentTime" class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">--:--:--</div>
-            <div id="currentDate" class="text-[10px] text-slate-400">กำลังโหลด...</div>
+            <div id="currentDate" class="text-[10px] text-slate-400 font-bold">กำลังโหลด...</div>
         </div>
     </header>
 
@@ -65,33 +65,34 @@
                     <p id="totalSavings" class="text-xl font-bold text-slate-900">฿0.00</p>
                 </div>
                 <div class="glass-card p-4">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase">โหมดอัตโนมัติ</p>
-                    <p id="currentMode" class="text-xl font-bold text-green-600">AUTO</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase">โหมดการทำงาน</p>
+                    <p id="currentMode" class="text-xl font-bold text-green-600 uppercase tracking-tighter">AUTO</p>
                 </div>
             </div>
 
-            <!-- Mali-X1 AI Smart Insight -->
+            <!-- AI-X2 Smart Insight (Internal Analysis) -->
             <div class="bg-slate-900 rounded-[1.5rem] p-5 text-white shadow-xl mb-4 relative overflow-hidden">
                 <div class="relative z-10">
                     <div class="flex items-center gap-2 mb-3">
                         <div class="p-1.5 bg-blue-500/20 rounded-lg">
                             <i data-lucide="cpu" class="w-4 h-4 text-blue-400"></i>
                         </div>
-                        <span class="text-xs font-bold uppercase tracking-widest text-blue-400">Mali-X1 AI Real-time</span>
+                        <span class="text-xs font-bold uppercase tracking-widest text-blue-400">AI-X2 Smart Analysis</span>
                     </div>
                     <p id="maliAnalysis" class="text-sm font-light leading-relaxed text-slate-300">
-                        วิเคราะห์ข้อมูลสำเร็จ: ระบบพร้อมทำงาน กำลังดึงข้อมูลจาก Cloud...
+                        กำลังรวบรวมข้อมูลจาก IOTNovasave Cloud...
                     </p>
+                    <div id="analysisTimer" class="mt-3 text-[9px] text-blue-400/60 font-bold uppercase tracking-[0.2em]">Next update in: 60s</div>
                 </div>
                 <div class="absolute top-0 right-0 p-4 opacity-10">
-                    <i data-lucide="sparkles" class="w-12 h-12"></i>
+                    <i data-lucide="sparkles" class="w-12 h-12 text-white"></i>
                 </div>
             </div>
 
             <!-- Chart -->
             <div class="glass-card p-5">
                 <h3 class="text-sm font-bold mb-4 flex items-center gap-2">
-                    <i data-lucide="bar-chart-3" class="w-4 h-4 text-blue-600"></i> สถิติวิเคราะห์ 7 วัน
+                    <i data-lucide="bar-chart-3" class="w-4 h-4 text-blue-600"></i> สถิติการออม 7 ครั้งล่าสุด
                 </h3>
                 <div class="h-40">
                     <canvas id="mainChart"></canvas>
@@ -102,7 +103,7 @@
         <!-- Add Records Section -->
         <section id="page-add" class="page-content anim-fade hidden">
             <div class="glass-card p-6 mb-6">
-                <h3 class="text-lg font-bold mb-4">บันทึกรายการ</h3>
+                <h3 class="text-lg font-bold mb-4">บันทึกรายการออม</h3>
                 <form id="recordForm" class="space-y-4">
                     <div>
                         <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">จำนวนเงิน (บาท)</label>
@@ -112,19 +113,19 @@
                         <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">หมวดหมู่</label>
                         <select id="inputCategory" class="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none">
                             <option value="lineman">Lineman</option>
-                            <option value="SP">SP (ShopeePay)</option>
-                            <option value="G">G (Grab/General)</option>
+                            <option value="SP">ShopeePay (SP)</option>
+                            <option value="G">Grab / General (G)</option>
                         </select>
                     </div>
-                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-blue-700 transition-all flex justify-center items-center gap-2">
-                        <i data-lucide="cloud-upload" class="w-5 h-5"></i> บันทึกลง Google Sheet
+                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-blue-700 transition-all flex justify-center items-center gap-2 active:scale-95">
+                        <i data-lucide="save" class="w-5 h-5"></i> บันทึกเข้า Google Sheets
                     </button>
                 </form>
             </div>
 
             <div class="space-y-3">
-                <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">ประวัติการบันทึก</h3>
-                <div id="historyList" class="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
+                <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">ประวัติรายการ</h3>
+                <div id="historyList" class="space-y-2 max-h-80 overflow-y-auto custom-scrollbar">
                     <!-- JS Loop -->
                 </div>
             </div>
@@ -133,37 +134,37 @@
         <!-- Goals Section -->
         <section id="page-goals" class="page-content anim-fade hidden">
             <div class="glass-card p-6 mb-6">
-                <h3 class="text-lg font-bold mb-4">เป้าหมายใหม่</h3>
+                <h3 class="text-lg font-bold mb-4">สร้างเป้าหมายใหม่</h3>
                 <div class="space-y-3">
-                    <input type="text" id="goalTitle" class="w-full p-4 bg-slate-50 rounded-2xl outline-none text-sm font-bold" placeholder="เช่น ซื้อโทรศัพท์ใหม่">
-                    <input type="number" id="goalAmount" class="w-full p-4 bg-slate-50 rounded-2xl outline-none text-sm font-bold" placeholder="เป้าหมาย (บาท)">
-                    <button onclick="addNewGoal()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold text-sm hover:bg-black">
-                        สร้างเป้าหมาย
+                    <input type="text" id="goalTitle" class="w-full p-4 bg-slate-50 rounded-2xl outline-none text-sm font-bold" placeholder="ชื่อเป้าหมาย เช่น ซื้อ Gadget">
+                    <input type="number" id="goalAmount" class="w-full p-4 bg-slate-50 rounded-2xl outline-none text-sm font-bold" placeholder="ยอดเงินเป้าหมาย (บาท)">
+                    <button onclick="addNewGoal()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold text-sm hover:bg-black transition-all">
+                        เพิ่มเป้าหมาย
                     </button>
                 </div>
             </div>
             
-            <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-3">เป้าหมายที่กำลังดำเนินการ</h3>
+            <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-3">เป้าหมายที่กำลังสะสม</h3>
             <div id="activeGoals" class="space-y-4">
                 <!-- JS Loop -->
             </div>
 
             <div class="mt-8">
-                <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-3">เป้าหมายที่สำเร็จแล้ว</h3>
-                <div id="completedGoals" class="space-y-2 opacity-60">
+                <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-3">เป้าหมายที่สำเร็จ</h3>
+                <div id="completedGoals" class="space-y-2">
                     <!-- JS Loop -->
                 </div>
             </div>
         </section>
 
-        <!-- AI Chat Section (Mali-X1 Local AI) -->
+        <!-- AI Chat Section -->
         <section id="page-chat" class="page-content anim-fade hidden flex flex-col h-[68vh]">
-            <div id="chatBox" class="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+            <div id="chatBox" class="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar p-2">
                 <!-- Chat Log -->
             </div>
-            <div class="flex gap-2 mt-4 bg-white p-2 rounded-2xl shadow-lg border border-slate-100">
-                <input type="text" id="chatInput" class="flex-1 p-3 outline-none text-sm font-bold" placeholder="ถาม Mali-X1 เรื่องยศ/เลเวล/แนะนำ...">
-                <button id="chatSend" class="bg-blue-600 text-white p-3 rounded-xl hover:bg-blue-700">
+            <div class="flex gap-2 mt-4 bg-white p-2 rounded-2xl shadow-xl border border-slate-100">
+                <input type="text" id="chatInput" class="flex-1 p-3 outline-none text-sm font-bold" placeholder="ถาม AI-X2 เรื่องยศ/เลเวล/เงินออม...">
+                <button id="chatSend" class="bg-blue-600 text-white p-3 rounded-xl hover:bg-blue-700 active:scale-90 transition-all">
                     <i data-lucide="send" class="w-5 h-5"></i>
                 </button>
             </div>
@@ -173,28 +174,28 @@
         <section id="page-settings" class="page-content anim-fade hidden">
             <div class="glass-card p-6 space-y-6">
                 <div>
-                    <h3 class="text-xl font-bold">การตั้งค่า</h3>
-                    <p class="text-xs text-slate-400 mt-1">เวอร์ชันระบบ: V.3.1.0 (Stable)</p>
+                    <h3 class="text-xl font-bold">ข้อมูลระบบ</h3>
+                    <p class="text-xs text-slate-400 mt-1">Version: V.3.1.1 (Stable Build)</p>
                 </div>
 
                 <div class="space-y-3">
                     <div class="p-4 bg-blue-50 rounded-2xl border border-blue-100">
-                        <p class="text-xs font-bold text-blue-800 mb-2 underline">มีอะไรใหม่ใน V.3.1.0:</p>
-                        <ul class="text-[10px] text-blue-700 space-y-1 list-disc ml-4">
-                            <li>AI Mali-X1 วิเคราะห์อัจฉริยะ (Local Processing)</li>
-                            <li>ระบบเป้าหมายแบบ Interactive แยกประวัติ</li>
-                            <li>Auto-Mode ปรับความเสถียรตามพฤติกรรม</li>
-                            <li>ระบบ Cloud Sync ดึงข้อมูล V2 อัตโนมัติ</li>
-                            <li>ปุ่ม Refresh รวดเร็วข้างโลโก้</li>
+                        <p class="text-xs font-bold text-blue-800 mb-2 underline">สิ่งที่อัปเดตแล้ว:</p>
+                        <ul class="text-[10px] text-blue-700 space-y-2 list-disc ml-4">
+                            <li>Auto-Migration: ดึงข้อมูลจาก V2 (Sheet เดิม) อัตโนมัติ</li>
+                            <li>AI-X2 Processor: วิเคราะห์ข้อมูลจริงแบบ Local ทุก 60 วินาที</li>
+                            <li>Fix Chat: แก้ไขระบบแชทขัดข้องให้กลับมาใช้งานได้ปกติ</li>
+                            <li>Enhanced Auto-Mode: ปรับความเข้มงวดตามพฤติกรรมการออม</li>
+                            <li>Security Wipe: ระบบล้างข้อมูลระดับ Cloud (กู้คืนไม่ได้)</li>
                         </ul>
                     </div>
                 </div>
 
                 <div class="pt-4 border-t border-slate-100">
                     <button onclick="wipeAllData()" class="w-full py-4 bg-red-50 text-red-600 border border-red-100 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-red-100 transition-all">
-                        <i data-lucide="alert-triangle" class="w-5 h-5"></i> ล้างข้อมูลและ Cloud ทั้งหมด
+                        <i data-lucide="alert-triangle" class="w-5 h-5"></i> ล้างข้อมูลและเริ่มต้นใหม่ทั้งหมด
                     </button>
-                    <p class="text-[9px] text-red-400 text-center mt-3 font-bold uppercase tracking-tighter">* คำเตือน: ข้อมูลเดิมใน Google Sheet จะหายถาวร</p>
+                    <p class="text-[9px] text-red-400 text-center mt-3 font-bold uppercase tracking-widest">* ข้อมูลใน Google Sheets จะถูกลบออกถาวร</p>
                 </div>
             </div>
         </section>
@@ -202,9 +203,9 @@
     </main>
 
     <!-- Navigation -->
-    <nav class="fixed bottom-4 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-white/90 backdrop-blur-xl border border-slate-200 shadow-2xl rounded-[2rem] h-16 flex items-center justify-around z-50 overflow-hidden px-2">
-        <button onclick="showPage('dashboard')" class="nav-item p-4 text-slate-300 transition-all" id="btn-dashboard"><i data-lucide="home"></i></button>
-        <button onclick="showPage('add')" class="nav-item p-4 text-slate-300 transition-all" id="btn-add"><i data-lucide="plus-circle"></i></button>
+    <nav class="fixed bottom-4 left-1/2 -translate-x-1/2 w-[92%] max-w-md bg-white/95 backdrop-blur-xl border border-slate-200 shadow-2xl rounded-[2rem] h-16 flex items-center justify-around z-50 overflow-hidden px-2">
+        <button onclick="showPage('dashboard')" class="nav-item p-4 text-slate-300 transition-all" id="btn-dashboard"><i data-lucide="layout-dashboard"></i></button>
+        <button onclick="showPage('add')" class="nav-item p-4 text-slate-300 transition-all" id="btn-add"><i data-lucide="plus-square"></i></button>
         <button onclick="showPage('goals')" class="nav-item p-4 text-slate-300 transition-all" id="btn-goals"><i data-lucide="target"></i></button>
         <button onclick="showPage('chat')" class="nav-item p-4 text-slate-300 transition-all" id="btn-chat"><i data-lucide="bot"></i></button>
         <button onclick="showPage('settings')" class="nav-item p-4 text-slate-300 transition-all" id="btn-settings"><i data-lucide="settings"></i></button>
@@ -222,12 +223,13 @@
             level: 1,
             xp: 0,
             rank: "กำลังคำนวณ...",
-            mode: "AUTO",
+            mode: "STABLE",
             chart: null,
-            isFirstLoad: true
+            isFirstLoad: true,
+            analysisSeconds: 60
         };
 
-        const ranks = ["นักออมฝึกหัด", "ผู้เริ่มเก็บออม", "นักสะสมเหรียญ", "อัศวินการคลัง", "แม่ทัพเงินล้าน", "มหาเศรษฐีโนวาสะ"];
+        const ranks = ["นักออมฝึกหัด", "ผู้เริ่มเก็บออม", "นักสะสมเหรียญ", "อัศวินการคลัง", "แม่ทัพเงินล้าน", "เศรษฐีโนวาสะ"];
 
         // UI Core
         function showPage(id) {
@@ -237,30 +239,47 @@
             const activeBtn = document.getElementById('btn-' + id);
             activeBtn.classList.add('nav-active', 'text-blue-600', 'bg-blue-50');
             
-            if (id === 'chat' && document.getElementById('chatBox').children.length === 0) maliGreet();
+            if (id === 'chat' && document.getElementById('chatBox').children.length === 0) aiGreet();
             refreshIcons();
         }
 
         function refreshIcons() {
-            lucide.createIcons();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         function updateClock() {
             const now = new Date();
             document.getElementById('currentTime').innerText = now.toLocaleTimeString('th-TH');
             document.getElementById('currentDate').innerText = now.toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' });
+            
+            // AI Analysis Timer
+            store.analysisSeconds--;
+            if (store.analysisSeconds <= 0) {
+                aiAutoAnalyze();
+                store.analysisSeconds = 60;
+            }
+            const timerEl = document.getElementById('analysisTimer');
+            if (timerEl) timerEl.innerText = `Next update in: ${store.analysisSeconds}s`;
         }
         setInterval(updateClock, 1000);
 
-        // Data Sync (Auto-Sync on start)
+        // Data Management (JSONP)
         async function syncFromCloud() {
             if (store.isFirstLoad) {
-                Swal.fire({ title: 'IOTNovasave V.3.1.0', text: 'กำลังซิงค์ข้อมูลจาก Cloud...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                Swal.fire({ 
+                    title: 'กำลังซิงค์ V.3.1.1', 
+                    text: 'ดึงข้อมูลจาก IOTNovasave_V2_Records...', 
+                    allowOutsideClick: false, 
+                    didOpen: () => Swal.showLoading() 
+                });
             }
 
             const callbackName = 'jsonp_load_' + Date.now();
             window[callbackName] = (res) => {
                 delete window[callbackName];
+                const scriptTag = document.getElementById(callbackName);
+                if (scriptTag) scriptTag.remove();
+
                 if (res.result === 'success') {
                     store.records = res.data || [];
                     store.goals = res.goals || [];
@@ -271,12 +290,13 @@
                         Swal.close();
                     }
                 } else {
-                    console.error("Cloud error:", res.message);
+                    Swal.fire('Error', 'ไม่สามารถเชื่อมต่อ Cloud ได้', 'error');
                 }
             };
 
             const script = document.createElement('script');
-            script.src = `${SCRIPT_URL}?action=load&callback=${callbackName}&v=3.1.0`;
+            script.id = callbackName;
+            script.src = `${SCRIPT_URL}?action=load&callback=${callbackName}&v=3.1.1`;
             document.body.appendChild(script);
         }
 
@@ -285,9 +305,12 @@
                 const callbackName = 'jsonp_post_' + Date.now();
                 window[callbackName] = (res) => {
                     delete window[callbackName];
+                    const scriptTag = document.getElementById(callbackName);
+                    if (scriptTag) scriptTag.remove();
                     resolve(res);
                 };
                 const script = document.createElement('script');
+                script.id = callbackName;
                 script.src = `${SCRIPT_URL}?action=${action}&callback=${callbackName}&data=${encodeURIComponent(JSON.stringify(payload))}`;
                 document.body.appendChild(script);
             });
@@ -295,24 +318,25 @@
 
         // Logic
         function recalculateState() {
-            // Total
+            // Calculate Total from records (Amount is stored as number/string in sheet)
             store.totalSavings = store.records.reduce((acc, cur) => acc + (parseFloat(cur.amount) || 0), 0);
             
-            // Level (500 per level)
+            // Level Logic (500 บาท = 1 เลเวล)
             const baseLevel = Math.floor(store.totalSavings / 500) + 1;
             store.level = baseLevel;
+            // XP is percentage of current level progress
             store.xp = Math.floor(((store.totalSavings % 500) / 500) * 100);
 
-            // Rank
+            // Rank Logic
             const rankIdx = Math.min(Math.floor((store.level - 1) / 5), ranks.length - 1);
             store.rank = ranks[rankIdx];
 
-            // Auto Mode Logic
-            const last24h = store.records.filter(r => (new Date() - new Date(r.timestamp)) < 86400000).length;
-            store.mode = last24h > 3 ? "SAVER+" : "STABLE";
+            // Auto Mode Logic (Stable vs Saver+)
+            const recent = store.records.filter(r => (new Date() - new Date(r.timestamp)) < 86400000).length;
+            store.mode = recent >= 3 ? "SAVER+" : "STABLE";
 
             updateUI();
-            maliAutoAnalyze();
+            aiAutoAnalyze();
         }
 
         function updateUI() {
@@ -323,41 +347,40 @@
             document.getElementById('rankName').innerText = store.rank;
             document.getElementById('currentMode').innerText = store.mode;
 
-            // History
+            // History List
             const hist = document.getElementById('historyList');
-            hist.innerHTML = store.records.slice().reverse().slice(0, 10).map(r => `
+            hist.innerHTML = store.records.slice().reverse().slice(0, 15).map(r => `
                 <div class="bg-white p-4 rounded-2xl border border-slate-50 flex justify-between items-center shadow-sm">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
                             <i data-lucide="wallet" class="w-5 h-5"></i>
                         </div>
                         <div>
-                            <p class="text-xs font-bold uppercase">${r.category}</p>
+                            <p class="text-xs font-bold uppercase text-slate-700">${r.category}</p>
                             <p class="text-[9px] text-slate-400 font-bold">${new Date(r.timestamp).toLocaleString('th-TH')}</p>
                         </div>
                     </div>
                     <p class="font-bold text-blue-600">฿${parseFloat(r.amount).toFixed(2)}</p>
                 </div>
-            `).join('') || '<p class="text-center text-xs text-slate-400 py-4">ยังไม่มีประวัติการออม</p>';
+            `).join('') || '<p class="text-center text-xs text-slate-400 py-8">ยังไม่มีประวัติการบันทึก</p>';
 
-            // Active Goals
+            // Goals Rendering
             const gAct = document.getElementById('activeGoals');
             gAct.innerHTML = store.goals.map((g, idx) => {
                 const perc = Math.min((store.totalSavings / g.target) * 100, 100);
-                const isFinished = perc >= 100;
                 return `
-                    <div class="glass-card p-5 ${isFinished ? 'border-green-400' : ''}">
+                    <div class="glass-card p-5 ${perc >= 100 ? 'border-green-400 ring-1 ring-green-100' : ''}">
                         <div class="flex justify-between mb-2">
-                            <span class="text-sm font-bold text-slate-700">${g.title}</span>
+                            <span class="text-sm font-bold text-slate-800">${g.title}</span>
                             <span class="text-xs font-bold text-blue-600">${perc.toFixed(1)}%</span>
                         </div>
                         <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden mb-3">
                             <div class="h-full bg-blue-600 transition-all duration-1000" style="width: ${perc}%"></div>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span class="text-[10px] font-bold text-slate-400">เป้าหมาย: ฿${g.target.toLocaleString()}</span>
-                            ${isFinished ? 
-                                `<button onclick="finishGoal(${idx})" class="px-3 py-1 bg-green-600 text-white text-[10px] rounded-lg font-bold pulse-blue">กดรับความสำเร็จ</button>` : 
+                            <span class="text-[10px] font-bold text-slate-400 uppercase">Target: ฿${parseFloat(g.target).toLocaleString()}</span>
+                            ${perc >= 100 ? 
+                                `<button onclick="finishGoal(${idx})" class="px-4 py-1.5 bg-green-600 text-white text-[10px] rounded-lg font-bold pulse-blue">สำเร็จ/เก็บเข้าประวัติ</button>` : 
                                 `<span class="text-[10px] font-bold text-blue-400">ขาดอีก ฿${Math.max(g.target - store.totalSavings, 0).toLocaleString()}</span>`
                             }
                         </div>
@@ -365,12 +388,11 @@
                 `;
             }).join('') || '<p class="text-center text-xs text-slate-400 py-4">ไม่มีเป้าหมายที่กำลังดำเนินการ</p>';
 
-            // Completed Goals
             const gDone = document.getElementById('completedGoals');
             gDone.innerHTML = store.completedGoals.map(g => `
-                <div class="bg-white p-3 rounded-xl border border-slate-100 flex justify-between items-center text-slate-500">
-                    <span class="text-xs font-bold"><i data-lucide="check-circle-2" class="inline w-3 h-3 mr-1 text-green-500"></i> ${g.title}</span>
-                    <span class="text-[10px] font-bold">สำเร็จที่ ฿${g.target.toLocaleString()}</span>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex justify-between items-center text-slate-400">
+                    <span class="text-xs font-bold"><i data-lucide="award" class="inline w-3 h-3 mr-1 text-yellow-500"></i> ${g.title}</span>
+                    <span class="text-[10px] font-bold">สำเร็จที่ ฿${parseFloat(g.target).toLocaleString()}</span>
                 </div>
             `).join('');
 
@@ -382,56 +404,68 @@
             const ctx = document.getElementById('mainChart').getContext('2d');
             if (store.chart) store.chart.destroy();
             
-            const data = store.records.slice(-7).map(r => parseFloat(r.amount));
-            const labels = store.records.slice(-7).map(r => new Date(r.timestamp).toLocaleDateString('th-TH', {day:'numeric', month:'short'}));
+            // Show last 7 records
+            const recentRecs = store.records.slice(-7);
+            const dataPoints = recentRecs.map(r => parseFloat(r.amount));
+            const labels = recentRecs.map(r => new Date(r.timestamp).toLocaleDateString('th-TH', {day:'numeric', month:'short'}));
 
             store.chart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels.length ? labels : ['-','-','-','-','-','-','-'],
                     datasets: [{
-                        data: data.length ? data : [0,0,0,0,0,0,0],
+                        data: dataPoints.length ? dataPoints : [0,0,0,0,0,0,0],
                         borderColor: '#2563eb',
                         backgroundColor: 'rgba(37, 99, 235, 0.05)',
                         fill: true,
                         tension: 0.4,
-                        pointRadius: 4,
-                        pointBackgroundColor: '#fff'
+                        pointRadius: 5,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#2563eb',
+                        pointBorderWidth: 2
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: { y: { display: false }, x: { grid: { display: false }, ticks: { font: { size: 9 } } } }
+                    scales: { 
+                        y: { display: false, beginAtZero: true }, 
+                        x: { grid: { display: false }, border: {display: false}, ticks: { font: { size: 9, weight: 'bold' }, color: '#94a3b8' } } 
+                    }
                 }
             });
         }
 
-        // AI Mali-X1 Logic
-        function maliAutoAnalyze() {
+        // AI-X2 Internal Processor
+        function aiAutoAnalyze() {
             const total = store.totalSavings;
+            const recCount = store.records.length;
             let insight = "";
-            if (total === 0) {
-                insight = "สวัสดีครับ! Mali-X1 ตรวจพบว่าระบบยังว่างอยู่ ลองเริ่มออมครั้งแรกเพื่อรับยศ นักออมฝึกหัด นะครับ";
-            } else if (total < 2000) {
-                insight = "วิเคราะห์สำเร็จ: ยอดออมกำลังเติบโต Mali-X1 แนะนำให้เน้นบันทึกหมวด Lineman ให้ละเอียดเพื่อตัดรายจ่ายฟุ่มเฟือยครับ";
-            } else if (store.mode === "SAVER+") {
-                insight = "ตรวจพบพฤติกรรม SAVER+! คุณออมเงินบ่อยมากในช่วง 24 ชม. นี้ Mali-X1 กำลังเร่งคำนวณโบนัสยศให้คุณครับ";
+
+            if (recCount === 0) {
+                insight = "ยินดีต้อนรับสู่ V.3.1.1 ครับ ระบบพร้อมทำงานแล้ว เริ่มบันทึกรายการออมเพื่อวิเคราะห์ยศและเลเวลได้ทันทีครับ";
             } else {
-                insight = `ยอดออม ฿${total.toLocaleString()} มีความเสถียรมาก ยศของคุณคือ ${store.rank} อีกนิดจะเลื่อนขั้นแล้วครับ`;
+                const avg = total / recCount;
+                if (total > 5000) {
+                    insight = `วิเคราะห์ยอด ฿${total.toLocaleString()}: คุณมีวินัยการออมที่ดีมาก ยศ ${store.rank} เหมาะกับคุณที่สุดครับ`;
+                } else if (store.mode === "SAVER+") {
+                    insight = "ตรวจพบโหมด SAVER+! คุณกำลังเร่งเก็บออมอย่างรวดเร็ว AI-X2 แนะนำให้รักษาจังหวะนี้เพื่อเลื่อนยศใน 1 สัปดาห์ครับ";
+                } else {
+                    insight = `ปัจจุบันออมไปแล้ว ${recCount} รายการ เฉลี่ยครั้งละ ฿${avg.toFixed(2)} ยศของคุณคือ ${store.rank} อีกนิดจะถึงเลเวลถัดไปครับ`;
+                }
             }
             document.getElementById('maliAnalysis').innerText = insight;
         }
 
-        function maliGreet() {
-            appendChat('mali', "สวัสดีครับ ผม Mali-X1 ระบบวิเคราะห์การออมของคุณ ปัจจุบันคุณอยู่นะดับ " + store.rank + " สอบถามข้อมูลยศ/เลเวล/สถิติได้เลยครับ");
+        function aiGreet() {
+            appendChat('ai', "สวัสดีครับ ผม AI-X2 ผู้ช่วยวิเคราะห์ข้อมูลออมเงิน V.3.1.1 ของคุณ สอบถามเรื่อง ยศ, เลเวล หรือสถิติการออมได้เลยครับ");
         }
 
         function appendChat(role, text) {
             const box = document.getElementById('chatBox');
             const d = document.createElement('div');
-            d.className = `p-4 text-sm max-w-[85%] rounded-2xl ${role === 'mali' ? 'bg-white border border-slate-100 mr-auto' : 'bg-blue-600 text-white ml-auto shadow-md'}`;
+            d.className = `p-4 text-sm max-w-[85%] rounded-2xl font-bold leading-relaxed ${role === 'ai' ? 'bg-white border border-slate-100 mr-auto text-slate-700' : 'bg-blue-600 text-white ml-auto shadow-md'}`;
             d.innerText = text;
             box.appendChild(d);
             box.scrollTop = box.scrollHeight;
@@ -445,21 +479,21 @@
             inp.value = '';
 
             setTimeout(() => {
-                let a = "Mali-X1 กำลังวิเคราะห์ข้อมูลของคุณ... ปัจจุบันคุณออมไปแล้ว " + store.totalSavings + " บาทครับ";
-                if (q.includes('ยศ')) a = `ยศปัจจุบันของคุณคือ "${store.rank}" เลเวล ${store.level} อีกไม่ไกลจะถึงระดับถัดไปแล้วครับ!`;
-                if (q.includes('เลเวล')) a = `เลเวล ${store.level} ของคุณสะสมไปแล้ว ${store.xp}% ออมเพิ่มอีกเล็กน้อยเพื่อเลเวลอัปนะครับ`;
-                if (q.includes('แนะนำ')) a = `Mali-X1 แนะนำ: ลองตั้งเป้าหมายเล็กๆ ในหน้า Goals และบันทึกรายการหมวด Lineman ให้สม่ำเสมอครับ`;
-                appendChat('mali', a);
+                let reply = "AI-X2 กำลังตรวจสอบฐานข้อมูล... ปัจจุบันคุณมียอดออมรวม " + store.totalSavings.toLocaleString() + " บาทครับ";
+                if (q.includes('ยศ')) reply = `ยศปัจจุบันของคุณคือ "${store.rank}" เป็นยศลำดับที่ ${ranks.indexOf(store.rank)+1} ของระบบครับ`;
+                if (q.includes('เลเวล') || q.includes('level')) reply = `คุณอยู่เลเวล ${store.level} สะสมไปแล้ว ${store.xp}% ออมอีก ฿${(500 - (store.totalSavings % 500)).toLocaleString()} จะเลื่อนขั้นครับ`;
+                if (q.includes('lineman')) reply = "จากการตรวจสอบ คุณใช้หมวด Lineman ในการบันทึกรายการบ้างเป็นบางครั้ง แนะนำให้คุมยอดส่วนนี้ให้ดีเพื่อเพิ่มเงินออมครับ";
+                appendChat('ai', reply);
             }, 600);
         };
 
-        // Handlers
+        // Form Handlers
         document.getElementById('recordForm').onsubmit = async (e) => {
             e.preventDefault();
             const amt = document.getElementById('inputAmount').value;
             const cat = document.getElementById('inputCategory').value;
             
-            Swal.fire({ title: 'กำลังส่งข้อมูลไป Cloud...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            Swal.fire({ title: 'กำลังบันทึกลง Cloud...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             
             const payload = { amount: amt, category: cat, timestamp: new Date().toISOString() };
             const res = await postToCloud(payload, 'save');
@@ -467,35 +501,37 @@
             if (res.result === 'success') {
                 store.records.push(payload);
                 recalculateState();
-                Swal.fire({ icon: 'success', title: 'สำเร็จ!', text: 'บันทึกข้อมูลเรียบร้อยแล้ว', timer: 1500 });
+                Swal.fire({ icon: 'success', title: 'สำเร็จ!', text: 'บันทึกข้อมูลเรียบร้อยแล้ว ยอดเงินและเลเวลอัปเดตแล้ว', timer: 2000 });
                 document.getElementById('recordForm').reset();
                 showPage('dashboard');
             } else {
-                Swal.fire('Error', 'บันทึกไม่สำเร็จ', 'error');
+                Swal.fire('Error', 'บันทึกไม่สำเร็จ กรุณาลองใหม่', 'error');
             }
         };
 
         async function addNewGoal() {
             const title = document.getElementById('goalTitle').value;
             const target = parseFloat(document.getElementById('goalAmount').value);
-            if (!title || !target) return;
+            if (!title || isNaN(target)) {
+                Swal.fire('ข้อมูลไม่ครบ', 'กรุณาระบุชื่อและยอดเงินเป้าหมาย', 'warning');
+                return;
+            }
 
+            Swal.fire({ title: 'สร้างเป้าหมาย...', didOpen: () => Swal.showLoading() });
             const g = { title, target, id: Date.now() };
-            Swal.fire({ title: 'กำลังสร้างเป้าหมาย...', didOpen: () => Swal.showLoading() });
-            
             const res = await postToCloud(g, 'saveGoal');
             if (res.result === 'success') {
                 store.goals.push(g);
                 updateUI();
                 document.getElementById('goalTitle').value = '';
                 document.getElementById('goalAmount').value = '';
-                Swal.fire('สร้างเป้าหมายสำเร็จ!', '', 'success');
+                Swal.fire('สำเร็จ!', 'เพิ่มเป้าหมายใหม่เรียบร้อย', 'success');
             }
         }
 
         async function finishGoal(idx) {
             const goal = store.goals[idx];
-            Swal.fire({ title: 'ยินดีด้วย!', text: `คุณทำเป้าหมาย "${goal.title}" สำเร็จแล้ว`, icon: 'success' });
+            Swal.fire({ title: 'ยินดีด้วย!', text: `เป้าหมาย "${goal.title}" สำเร็จแล้ว!`, icon: 'success' });
             
             const res = await postToCloud({id: goal.id}, 'finishGoal');
             if (res.result === 'success') {
@@ -508,11 +544,11 @@
         async function wipeAllData() {
             const confirm = await Swal.fire({
                 title: 'ยืนยันการล้างข้อมูล?',
-                text: "ข้อมูลทั้งในเครื่องและใน Google Sheets V2 จะถูกลบถาวร รวมถึงยศและเลเวล!",
+                text: "ข้อมูลทั้งในเครื่องและใน Cloud (V2 Records) จะถูกลบถาวร ไม่สามารถกู้คืนได้!",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#ef4444',
-                confirmButtonText: 'ลบทุกอย่างถาวร'
+                confirmButtonText: 'ลบทิ้งถาวร'
             });
 
             if (confirm.isConfirmed) {
