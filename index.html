@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IOTNovasave V.3.4.5 | Summer 2026</title>
+    <title>IOTNovasave V.3.4.9 | Summer 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -12,248 +12,266 @@
     <style>
         :root {
             --summer-primary: #ff8c00;
-            --summer-secondary: #0ea5e9;
-            --summer-bg: #fffcf0;
+            --summer-secondary: #00bcd4;
+            --summer-bg: #fffbf0;
         }
-        body { font-family: 'Kanit', sans-serif; background-color: var(--summer-bg); color: #431407; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
-        .nav-active { color: var(--summer-primary); background: #fff7ed; border-radius: 1rem; }
-        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); border: 1px solid #fed7aa; border-radius: 1.5rem; }
-        .page-content { animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        body { font-family: 'Kanit', sans-serif; background-color: var(--summer-bg); color: #4a3721; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+        .nav-active { color: var(--summer-primary); background: #fff3e0; border-radius: 1.25rem; }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border: 1px solid #ffe0b2; border-radius: 2rem; }
+        .page-content { animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         
         #loadingOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: white; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999;
+            background: #fff; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 10000;
         }
         .sun-loader {
-            width: 80px; height: 80px; background: #fbbf24; border-radius: 50%;
-            box-shadow: 0 0 40px #fbbf24; animation: pulse 1.5s infinite;
+            width: 80px; height: 80px; background: #ffca28; border-radius: 50%;
+            box-shadow: 0 0 40px #ffca28; animation: pulse 1s ease-in-out infinite;
         }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } }
 
-        #bottomNav { transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); transform: translate(-50%, 0); }
-        .nav-hidden { transform: translate(-50%, 200%) !important; }
+        #bottomNav { transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+        .nav-hidden { transform: translate(-50%, 200%) scale(0.5); opacity: 0; }
 
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #fbbf24; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #ffcc80; border-radius: 10px; }
         
-        /* Calculator Styles */
-        .calc-btn { @apply h-14 rounded-2xl text-lg font-bold transition-all active:scale-90 flex items-center justify-center; }
+        input, select { border: 2px solid #fff3e0 !important; transition: border-color 0.3s; }
+        input:focus, select:focus { border-color: var(--summer-primary) !important; }
     </style>
 </head>
 <body class="pb-32">
 
-    <!-- Loading Screen -->
+    <!-- Global Loading -->
     <div id="loadingOverlay">
         <div class="sun-loader mb-6"></div>
-        <p class="text-orange-600 font-black tracking-widest text-sm animate-bounce">กำลังโหลด...</p>
+        <p class="text-amber-600 font-black animate-bounce tracking-widest text-sm">LOADING SUMMER SAVINGS...</p>
+        <p class="text-[10px] text-amber-400 font-bold uppercase mt-2">AI-X4.0 Engine Initializing</p>
     </div>
 
-    <!-- Header -->
-    <header class="bg-white/80 backdrop-blur-md p-4 sticky top-0 z-50 border-b border-orange-100 flex justify-between items-center shadow-sm">
-        <div class="flex items-center gap-3">
-            <button onclick="toggleNav()" class="p-2 bg-orange-500 rounded-2xl text-white shadow-lg active:rotate-12 transition-transform">
-                <i data-lucide="sun" class="w-6 h-6"></i>
+    <!-- Header UI -->
+    <header class="bg-white/90 backdrop-blur-lg p-5 sticky top-0 z-50 border-b border-orange-100 flex justify-between items-center shadow-md">
+        <div class="flex items-center gap-4">
+            <button onclick="toggleNav()" class="w-12 h-12 bg-gradient-to-br from-orange-400 to-yellow-400 rounded-2xl flex items-center justify-center text-white shadow-lg active:scale-90 transition-transform">
+                <i data-lucide="sun" class="w-7 h-7"></i>
             </button>
             <div>
-                <div class="flex items-center gap-1">
-                    <h1 class="text-xl font-extrabold text-orange-950">IOTNovasave</h1>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-xl font-black text-orange-900 tracking-tighter">IOTNovasave</h1>
                     <button onclick="location.reload()" class="p-1 hover:bg-orange-50 rounded-full">
-                        <i data-lucide="refresh-cw" class="w-3 h-3 text-orange-400"></i>
+                        <i data-lucide="refresh-cw" class="w-4 h-4 text-orange-300"></i>
                     </button>
                 </div>
-                <p id="currentDateTime" class="text-[9px] font-bold text-orange-400 uppercase tracking-wider"></p>
+                <p id="currentDateTime" class="text-[9px] font-extrabold text-orange-400 uppercase tracking-widest"></p>
             </div>
         </div>
         <div class="text-right">
-            <div id="rankBadge" class="inline-block px-3 py-0.5 bg-orange-100 text-orange-700 text-[10px] font-black rounded-full mb-1 uppercase">BRONZE</div>
-            <div class="text-[9px] font-bold text-slate-400 uppercase">LV. <span id="lvDisplay">1</span> (<span id="xpPercentDisplay">0</span>%)</div>
-            <div class="w-24 h-1.5 bg-slate-100 rounded-full mt-1 overflow-hidden border border-orange-50">
-                <div id="xpBar" class="h-full bg-orange-500 transition-all duration-1000" style="width: 0%"></div>
+            <div id="rankBadge" class="px-3 py-1 bg-orange-600 text-white text-[9px] font-black rounded-lg mb-1 shadow-sm">LOADING</div>
+            <div class="text-[9px] font-black text-orange-800 uppercase">LV. <span id="lvDisplay">1</span></div>
+            <div class="w-20 h-2 bg-orange-100 rounded-full mt-1 overflow-hidden">
+                <div id="xpBar" class="h-full bg-gradient-to-r from-orange-500 to-yellow-400 transition-all duration-1000" style="width: 0%"></div>
             </div>
         </div>
     </header>
 
-    <main class="max-w-md mx-auto p-4 space-y-6">
+    <main id="app" class="max-w-md mx-auto p-4 space-y-6">
 
-        <!-- DASHBOARD -->
+        <!-- PAGE: DASHBOARD -->
         <section id="page-dashboard" class="page-content space-y-4">
             <div class="grid grid-cols-2 gap-4">
-                <div class="glass-card p-5 shadow-sm relative overflow-hidden group">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">เงินออมสุทธิ</p>
-                    <h2 id="totalBalance" class="text-2xl font-black text-orange-950">฿0.00</h2>
-                    <button onclick="editManualBalance()" class="absolute top-2 right-2 p-1 text-orange-200 hover:text-orange-500 transition-colors">
-                        <i data-lucide="edit-3" class="w-3 h-3"></i>
+                <div class="glass-card p-6 shadow-xl relative overflow-hidden bg-gradient-to-br from-white to-orange-50">
+                    <p class="text-[10px] font-black text-orange-400 uppercase tracking-widest mb-1">เงินออมสุทธิ</p>
+                    <h2 id="totalBalance" class="text-2xl font-black text-orange-900">฿0.00</h2>
+                    <button onclick="editManualBalance()" class="absolute top-3 right-3 p-1.5 bg-orange-100 text-orange-600 rounded-lg">
+                        <i data-lucide="pencil" class="w-3 h-3"></i>
                     </button>
                 </div>
-                <div class="glass-card p-5 shadow-sm">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pocket Active</p>
-                    <h2 id="activeGoalCount" class="text-2xl font-black text-sky-500">0</h2>
+                <div class="glass-card p-6 shadow-xl bg-gradient-to-br from-white to-cyan-50">
+                    <p class="text-[10px] font-black text-cyan-400 uppercase tracking-widest mb-1">เป้าหมาย (Pocket)</p>
+                    <h2 id="goalProgressCount" class="text-2xl font-black text-cyan-700">0%</h2>
                 </div>
             </div>
 
-            <!-- AI-X4.0 Processor Card -->
-            <div class="bg-orange-600 p-6 rounded-[2.5rem] text-white shadow-xl relative overflow-hidden">
+            <!-- AI-X4.0 Insights -->
+            <div class="bg-orange-900 p-6 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden border-4 border-orange-800">
                 <div class="relative z-10">
-                    <div class="flex items-center gap-2 mb-3">
-                        <span class="px-2 py-0.5 bg-white/20 rounded-lg text-[9px] font-black tracking-widest uppercase">AI-X4.0 Core</span>
-                        <span id="aiStatus" class="text-[9px] text-orange-200 font-bold uppercase tracking-widest flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-ping"></span> Online
-                        </span>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="px-3 py-1 bg-yellow-400 text-orange-900 rounded-full text-[10px] font-black uppercase tracking-widest">AI-X4.0 Summative</span>
+                        <div class="flex items-center gap-1">
+                            <span class="w-2 h-2 bg-green-400 rounded-full animate-ping"></span>
+                            <span class="text-[9px] font-bold">LIVE ANALYSIS</span>
+                        </div>
                     </div>
-                    <p id="aiInsight" class="text-sm leading-relaxed text-white font-medium">"กำลังวิเคราะห์ข้อมูลการเงินใน 10 วินาที..."</p>
-                    <div id="analysisStats" class="mt-4 flex flex-wrap gap-2">
-                        <span class="text-[9px] bg-black/10 px-3 py-1 rounded-full">...</span>
+                    <p id="aiInsight" class="text-sm font-medium leading-relaxed italic text-orange-100">"กำลังประมวลผลข้อมูลการออมใน 10 วินาที..."</p>
+                    <div class="mt-4 grid grid-cols-2 gap-2">
+                        <div class="bg-white/10 p-2 rounded-xl text-[9px] border border-white/10">
+                            <p class="opacity-60">อัตราการออม</p>
+                            <p id="savingRate" class="font-black text-yellow-400">คำนวณ...</p>
+                        </div>
+                        <div class="bg-white/10 p-2 rounded-xl text-[9px] border border-white/10">
+                            <p class="opacity-60">สถานะกระเป๋า</p>
+                            <p id="pocketStatus" class="font-black text-cyan-400">กำลังตรวจสอบ...</p>
+                        </div>
                     </div>
                 </div>
-                <i data-lucide="zap" class="absolute -right-6 -bottom-6 w-32 h-32 text-white/10"></i>
+                <i data-lucide="zap" class="absolute -right-6 -bottom-6 w-32 h-32 text-white/5"></i>
             </div>
 
             <div class="glass-card p-6">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xs font-black text-orange-950 flex items-center gap-2 uppercase tracking-tighter">
-                        <i data-lucide="trending-up" class="w-4 h-4 text-orange-500"></i> สถิติการเงินจริง
+                    <h3 class="text-xs font-black text-orange-900 uppercase flex items-center gap-2">
+                        <i data-lucide="trending-up" class="w-4 h-4"></i> สถิติการออม (7 วัน)
                     </h3>
                 </div>
                 <div class="h-44">
                     <canvas id="mainChart"></canvas>
                 </div>
             </div>
-
-            <div class="glass-card p-5">
-                <h3 class="text-xs font-black text-orange-950 mb-4 uppercase tracking-widest">ประวัติการออมล่าสุด</h3>
+            
+            <div class="glass-card p-6">
+                <h3 class="text-xs font-black text-orange-900 uppercase mb-4">ประวัติรายการล่าสุด</h3>
                 <div id="historyList" class="space-y-3"></div>
             </div>
         </section>
 
-        <!-- ADD TRANSACTION -->
+        <!-- PAGE: ADD TRANSACTION -->
         <section id="page-add" class="page-content hidden space-y-6">
-            <div class="glass-card p-8 shadow-md">
-                <h2 class="text-2xl font-black text-orange-950 mb-6">บันทึกรายได้/เงินออม</h2>
+            <div class="glass-card p-8 shadow-2xl">
+                <h2 class="text-2xl font-black text-orange-900 mb-6 flex items-center gap-3">
+                    <i data-lucide="plus-circle" class="w-8 h-8 text-orange-500"></i> บันทึกการออม
+                </h2>
                 <form id="saveForm" class="space-y-5">
                     <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">จำนวนเงิน (฿)</label>
-                        <input type="number" id="amount" step="0.01" required class="w-full p-5 bg-orange-50/50 border-2 border-transparent focus:border-orange-500 rounded-2xl outline-none text-2xl font-black" placeholder="0.00">
+                        <label class="block text-[10px] font-black text-orange-400 uppercase tracking-widest mb-2">จำนวนเงินออม (บาท)</label>
+                        <input type="number" id="amount" step="0.01" required class="w-full p-5 bg-orange-50/50 rounded-2xl outline-none text-3xl font-black text-orange-600" placeholder="0.00">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">หมวดหมู่</label>
-                        <div class="grid grid-cols-3 gap-2">
-                            <button type="button" onclick="setCategory('lineman')" class="cat-btn p-3 rounded-xl border border-orange-100 text-[10px] font-bold bg-white" id="cat-lineman">LINEMAN</button>
-                            <button type="button" onclick="setCategory('SP')" class="cat-btn p-3 rounded-xl border border-orange-100 text-[10px] font-bold bg-white" id="cat-SP">SHOPEE</button>
-                            <button type="button" onclick="setCategory('ทั่วไป')" class="cat-btn p-3 rounded-xl border border-orange-100 text-[10px] font-bold bg-orange-500 text-white" id="cat-ทั่วไป">ทั่วไป</button>
-                        </div>
+                        <label class="block text-[10px] font-black text-orange-400 uppercase tracking-widest mb-2">หมวดหมู่</label>
+                        <select id="category" class="w-full p-4 bg-orange-50/50 rounded-2xl outline-none font-bold text-orange-800">
+                            <option value="lineman">🛵 Lineman</option>
+                            <option value="SP">🛒 Shopee (SP)</option>
+                            <option value="ทั่วไป">💰 ออมทั่วไป</option>
+                        </select>
                     </div>
-                    <button type="submit" class="w-full bg-orange-500 text-white py-5 rounded-[2rem] font-black shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all">
-                        <i data-lucide="cloud-upload" class="w-6 h-6"></i> บันทึกลง Cloud IOT
+                    <button type="submit" class="w-full bg-orange-600 text-white py-5 rounded-3xl font-black shadow-lg shadow-orange-200 flex items-center justify-center gap-3 active:scale-95 transition-all">
+                        <i data-lucide="save" class="w-6 h-6"></i> บันทึกลง Cloud
                     </button>
                 </form>
             </div>
         </section>
 
-        <!-- GOALS (POCKET 2.0) -->
+        <!-- PAGE: POCKETS (GOALS) -->
         <section id="page-pockets" class="page-content hidden space-y-4">
-            <div class="glass-card p-6 border-t-4 border-sky-500">
-                <h3 class="text-lg font-black text-orange-950 mb-4">Cloud Pocket 2.0</h3>
+            <div class="glass-card p-8 border-t-8 border-cyan-400">
+                <h2 class="text-2xl font-black text-cyan-900 mb-4">Cloud Pocket 2.0 🏝️</h2>
                 <div class="space-y-4">
-                    <input type="text" id="goalTitle" class="w-full p-4 bg-slate-50 border-0 rounded-2xl text-sm font-bold outline-none" placeholder="ชื่อกระเป๋าเป้าหมาย">
-                    <input type="number" id="goalTarget" class="w-full p-4 bg-slate-50 border-0 rounded-2xl text-sm font-bold outline-none" placeholder="เป้าหมาย (฿)">
-                    <button onclick="addGoal()" class="w-full bg-sky-600 text-white py-4 rounded-2xl font-black text-sm shadow-lg">สร้าง Pocket ใหม่</button>
+                    <input type="text" id="goalTitle" class="w-full p-4 bg-cyan-50 border-0 rounded-2xl font-bold outline-none" placeholder="ชื่อเป้าหมาย (เช่น ทริปทะเล)">
+                    <input type="number" id="goalTarget" class="w-full p-4 bg-cyan-50 border-0 rounded-2xl font-bold outline-none" placeholder="เป้าหมายยอดเงิน">
+                    <button onclick="addGoal()" class="w-full bg-cyan-600 text-white py-4 rounded-2xl font-black shadow-lg">สร้าง Pocket ใหม่</button>
                 </div>
             </div>
-            <div id="goalList" class="space-y-3"></div>
-            <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-6">สำเร็จแล้ว</h4>
-            <div id="completedGoalList" class="space-y-2 opacity-60"></div>
+            
+            <div id="goalList" class="space-y-4"></div>
+
+            <div class="glass-card p-6">
+                <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Pocket ที่สำเร็จแล้ว</h3>
+                <div id="completedGoalList" class="space-y-2"></div>
+            </div>
         </section>
 
-        <!-- CALC & TOOLS -->
-        <section id="page-tools" class="page-content hidden space-y-6">
-            <!-- Calculator -->
-            <div class="glass-card p-6 shadow-lg">
-                <div class="bg-orange-950 p-6 rounded-3xl mb-4 text-right">
-                    <div id="calcHistory" class="text-[10px] text-orange-400 font-bold h-4"></div>
-                    <div id="calcDisplay" class="text-3xl font-black text-white overflow-hidden">0</div>
+        <!-- PAGE: CALCULATOR & ANALYTICS -->
+        <section id="page-calc" class="page-content hidden space-y-6">
+            <div class="glass-card p-6">
+                <h2 class="text-xl font-black text-orange-900 mb-6 flex items-center gap-2">
+                    <i data-lucide="calculator" class="w-6 h-6"></i> เครื่องคิดเลข 2026
+                </h2>
+                <div class="bg-orange-50 p-4 rounded-3xl mb-4">
+                    <input type="text" id="calcDisplay" readonly class="w-full bg-transparent text-right text-3xl font-black text-orange-600 outline-none" value="0">
                 </div>
                 <div class="grid grid-cols-4 gap-2">
-                    <button onclick="calcClear()" class="calc-btn bg-orange-100 text-orange-600">C</button>
-                    <button onclick="calcOp('/')" class="calc-btn bg-sky-100 text-sky-600">/</button>
-                    <button onclick="calcOp('*')" class="calc-btn bg-sky-100 text-sky-600">×</button>
-                    <button onclick="calcDel()" class="calc-btn bg-orange-100 text-orange-600">DEL</button>
-                    
-                    <button onclick="calcNum('7')" class="calc-btn bg-white">7</button>
-                    <button onclick="calcNum('8')" class="calc-btn bg-white">8</button>
-                    <button onclick="calcNum('9')" class="calc-btn bg-white">9</button>
-                    <button onclick="calcOp('-')" class="calc-btn bg-sky-100 text-sky-600">-</button>
-                    
-                    <button onclick="calcNum('4')" class="calc-btn bg-white">4</button>
-                    <button onclick="calcNum('5')" class="calc-btn bg-white">5</button>
-                    <button onclick="calcNum('6')" class="calc-btn bg-white">6</button>
-                    <button onclick="calcOp('+')" class="calc-btn bg-sky-100 text-sky-600">+</button>
-                    
-                    <button onclick="calcNum('1')" class="calc-btn bg-white">1</button>
-                    <button onclick="calcNum('2')" class="calc-btn bg-white">2</button>
-                    <button onclick="calcNum('3')" class="calc-btn bg-white">3</button>
-                    <button onclick="calcEqual()" class="calc-btn bg-orange-500 text-white row-span-2">=</button>
-                    
-                    <button onclick="calcNum('0')" class="calc-btn bg-white col-span-2">0</button>
-                    <button onclick="calcNum('.')" class="calc-btn bg-white">.</button>
+                    <!-- Basic Calc Buttons -->
+                    <button onclick="calc('7')" class="p-4 bg-white rounded-xl font-black shadow-sm">7</button>
+                    <button onclick="calc('8')" class="p-4 bg-white rounded-xl font-black shadow-sm">8</button>
+                    <button onclick="calc('9')" class="p-4 bg-white rounded-xl font-black shadow-sm">9</button>
+                    <button onclick="calc('/')" class="p-4 bg-orange-100 text-orange-600 rounded-xl font-black shadow-sm">/</button>
+                    <button onclick="calc('4')" class="p-4 bg-white rounded-xl font-black shadow-sm">4</button>
+                    <button onclick="calc('5')" class="p-4 bg-white rounded-xl font-black shadow-sm">5</button>
+                    <button onclick="calc('6')" class="p-4 bg-white rounded-xl font-black shadow-sm">6</button>
+                    <button onclick="calc('*')" class="p-4 bg-orange-100 text-orange-600 rounded-xl font-black shadow-sm">*</button>
+                    <button onclick="calc('1')" class="p-4 bg-white rounded-xl font-black shadow-sm">1</button>
+                    <button onclick="calc('2')" class="p-4 bg-white rounded-xl font-black shadow-sm">2</button>
+                    <button onclick="calc('3')" class="p-4 bg-white rounded-xl font-black shadow-sm">3</button>
+                    <button onclick="calc('-')" class="p-4 bg-orange-100 text-orange-600 rounded-xl font-black shadow-sm">-</button>
+                    <button onclick="calc('0')" class="p-4 bg-white rounded-xl font-black shadow-sm">0</button>
+                    <button onclick="calc('.')" class="p-4 bg-white rounded-xl font-black shadow-sm">.</button>
+                    <button onclick="calc('C')" class="p-4 bg-rose-100 text-rose-600 rounded-xl font-black shadow-sm">C</button>
+                    <button onclick="calc('+')" class="p-4 bg-orange-100 text-orange-600 rounded-xl font-black shadow-sm">+</button>
+                    <button onclick="calc('=')" class="col-span-4 p-4 bg-orange-600 text-white rounded-xl font-black shadow-lg">=</button>
                 </div>
             </div>
 
-            <!-- Savings Calculator -->
             <div class="glass-card p-6">
-                <h3 class="text-xs font-black text-orange-950 mb-4 uppercase">คำนวณการออมล่วงหน้า</h3>
+                <h3 class="text-lg font-black text-orange-900 mb-4">คำนวณเป้าหมายรายวัน/เดือน</h3>
                 <div class="space-y-4">
-                    <input type="number" id="calcDaily" class="w-full p-4 bg-slate-50 border-0 rounded-2xl text-sm font-bold outline-none" placeholder="ออมวันละกี่บาท?">
-                    <div class="grid grid-cols-3 gap-2">
-                        <button onclick="forecast(30)" class="p-3 bg-orange-50 text-[10px] font-black rounded-xl">1 เดือน</button>
-                        <button onclick="forecast(365)" class="p-3 bg-orange-50 text-[10px] font-black rounded-xl">1 ปี</button>
-                        <button onclick="customForecast()" class="p-3 bg-sky-500 text-white text-[10px] font-black rounded-xl">กำหนดเอง</button>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="number" id="planTarget" class="p-4 bg-slate-50 rounded-2xl font-bold outline-none" placeholder="ยอดเงินที่ต้องการ">
+                        <input type="number" id="planDays" class="p-4 bg-slate-50 rounded-2xl font-bold outline-none" placeholder="จำนวนวัน">
                     </div>
-                    <div id="forecastResult" class="p-4 bg-orange-950 text-orange-200 rounded-2xl text-xs font-bold hidden"></div>
+                    <button onclick="calculatePlan()" class="w-full bg-orange-600 text-white py-4 rounded-2xl font-black">คำนวณแผนการออม</button>
+                    <div id="planResult" class="p-4 bg-orange-50 rounded-2xl text-sm font-bold text-orange-800 hidden text-center"></div>
                 </div>
             </div>
         </section>
 
-        <!-- CHAT AI -->
-        <section id="page-chat" class="page-content hidden flex flex-col h-[60vh]">
+        <!-- PAGE: CHAT AI -->
+        <section id="page-chat" class="page-content hidden flex flex-col h-[70vh]">
             <div id="chatBox" class="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar mb-4">
-                <div class="bg-white p-4 rounded-3xl rounded-tl-none border border-orange-50 shadow-sm text-sm">
-                    <p class="font-black text-orange-600 mb-1">AI-X4.0 Analyst</p>
-                    สวัสดี! ผมประมวลผลข้อมูลในหน้าหลักของคุณเรียบร้อยแล้ว ถามข้อมูลเลเวล ยศ สรุปการออม หรือคู่มือได้เลยครับ
+                <div class="bg-white p-5 rounded-3xl rounded-tl-none border border-orange-100 shadow-sm text-sm">
+                    <p class="font-black text-orange-600 mb-1">AI-X4.0 Assistant 🤖</p>
+                    สวัสดีครับ! ผมดึงข้อมูลจริงจาก Cloud ของคุณมาแล้ว มีอะไรให้ช่วยวิเคราะห์ไหมครับ? ถามเรื่องเลเวล ยศ ยอดเงิน หรือคู่มือการใช้งานได้เลย!
                 </div>
             </div>
-            <div class="flex gap-2 p-2 bg-white rounded-[2rem] shadow-xl border border-orange-100">
-                <input type="text" id="chatInput" class="flex-1 p-3 outline-none text-sm font-medium ml-3" placeholder="พิมพ์คำถามที่นี่...">
-                <button onclick="handleChat()" class="p-4 bg-orange-500 text-white rounded-full active:scale-90"><i data-lucide="send" class="w-5 h-5"></i></button>
+            <div class="flex gap-2 p-3 bg-white rounded-[2rem] shadow-2xl border border-orange-100">
+                <input type="text" id="chatInput" class="flex-1 p-3 outline-none text-sm font-medium ml-2" placeholder="คุยกับ AI วิเคราะห์ข้อมูลการออม...">
+                <button onclick="handleChat()" class="p-4 bg-orange-600 text-white rounded-2xl active:scale-90 shadow-lg"><i data-lucide="send" class="w-5 h-5"></i></button>
             </div>
         </section>
 
-        <!-- SETTINGS -->
-        <section id="page-settings" class="page-content hidden space-y-4">
+        <!-- PAGE: SETTINGS -->
+        <section id="page-settings" class="page-content hidden space-y-6">
             <div class="glass-card p-8">
-                <h2 class="text-2xl font-black text-orange-950 mb-6">ตั้งค่าโปรไฟล์</h2>
+                <h2 class="text-2xl font-black text-orange-900 mb-6">ตั้งค่าระบบ</h2>
                 <div class="space-y-4">
-                    <div class="p-4 bg-orange-50 rounded-2xl flex justify-between items-center text-xs font-bold">
-                        <span class="text-orange-800">โปรไฟล์</span>
-                        <span class="text-orange-600 font-black">User_Novasave</span>
+                    <div class="flex items-center justify-between p-5 bg-orange-50 rounded-3xl">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-orange-500 shadow-sm">
+                                <i data-lucide="user" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black text-orange-400 uppercase">โปรไฟล์</p>
+                                <p class="text-sm font-black text-orange-900">User_Novasave</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 bg-white rounded-full text-[9px] font-black text-orange-600 border border-orange-100">PREMIUM</span>
                     </div>
-                    <div class="p-4 bg-orange-50 rounded-2xl flex justify-between items-center text-xs font-bold">
-                        <span class="text-orange-800">VERSION</span>
-                        <span class="px-3 py-1 bg-orange-600 text-white rounded-full font-black">V.3.4.5 Summer</span>
-                    </div>
-                    <div class="p-5 border border-orange-100 rounded-2xl bg-white/50 space-y-3">
-                        <p class="text-[10px] font-black text-orange-500 uppercase tracking-widest">Update Log V.3.4.5:</p>
-                        <ul class="text-[9px] font-bold text-slate-500 space-y-1 list-disc list-inside">
-                            <li>Summer Theme 2026 UX/UI ใหม่</li>
-                            <li>AI-X4.0 On-device Analysis (10s Auto)</li>
-                            <li>Cloud Pocket 2.0 ระบบกระเป๋าแยกส่วน</li>
-                            <li>เครื่องคิดเลข V.2026 & ตัวคำนวณออมล่วงหน้า</li>
-                            <li>ระบบ JSONP ไร้ปัญหา Cross-origin</li>
-                            <li>เมนูบาร์ซ่อนได้ (กดที่ Logo พระอาทิตย์)</li>
+
+                    <div class="p-6 border-2 border-orange-100 rounded-[2rem] space-y-3 bg-white/50">
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="font-black text-orange-500 uppercase tracking-widest text-xs">Version History</p>
+                            <span class="px-2 py-0.5 bg-orange-600 text-white text-[10px] rounded-lg font-black">V.3.4.9</span>
+                        </div>
+                        <ul class="text-[10px] font-bold text-slate-500 space-y-1">
+                            <li>✨ ปรับปรุงระบบ Pocket 2.0 (บันทึกแยกยอดอิสระ)</li>
+                            <li>🤖 AI-X4.0 Engine วิเคราะห์ข้อมูลจริงแบบ Non-API</li>
+                            <li>📱 เมนูบาร์ใหม่แบบ Pop-up (กดที่โลโก้)</li>
+                            <li>🧮 เพิ่มเครื่องคิดเลข & ระบบวางแผนการออม 2026</li>
+                            <li>☁️ เชื่อมโยง IOTNovasave_V2_Records อัตโนมัติ</li>
                         </ul>
                     </div>
-                    <button onclick="wipeAllData()" class="w-full py-5 bg-red-50 text-red-600 border-2 border-red-100 rounded-[2rem] font-black flex items-center justify-center gap-3 active:bg-red-100 transition-all">
-                        <i data-lucide="alert-triangle" class="w-5 h-5"></i> ล้างข้อมูลถาวร & Reset Cloud
+
+                    <button onclick="hardReset()" class="w-full py-5 bg-rose-50 text-rose-600 border-2 border-rose-100 rounded-3xl font-black flex items-center justify-center gap-3 active:scale-95 transition-all">
+                        <i data-lucide="trash-2" class="w-5 h-5"></i> ล้างข้อมูลถาวร & Cloud Wipe
                     </button>
                 </div>
             </div>
@@ -261,25 +279,25 @@
 
     </main>
 
-    <!-- Navigation -->
-    <nav id="bottomNav" class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md bg-white/95 backdrop-blur-xl border border-orange-100 shadow-2xl rounded-[2.5rem] h-20 flex justify-around items-center px-2 z-50">
-        <button onclick="nav('dashboard')" id="nav-dashboard" class="nav-btn flex flex-col items-center gap-1 p-2 text-slate-400 nav-active">
-            <i data-lucide="layout-grid" class="w-5 h-5"></i><span class="text-[8px] font-black uppercase tracking-tighter">หน้าหลัก</span>
+    <!-- Navigation Bar -->
+    <nav id="bottomNav" class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md bg-white/95 backdrop-blur-2xl border border-orange-100 shadow-[0_20px_50px_rgba(255,140,0,0.2)] rounded-[2.5rem] h-20 flex justify-around items-center px-2 z-50">
+        <button onclick="nav('dashboard')" id="nav-dashboard" class="nav-btn flex flex-col items-center gap-1 p-3 text-slate-400 nav-active">
+            <i data-lucide="home" class="w-5 h-5"></i><span class="text-[8px] font-black uppercase">Home</span>
         </button>
-        <button onclick="nav('add')" id="nav-add" class="nav-btn flex flex-col items-center gap-1 p-2 text-slate-400">
-            <i data-lucide="plus-square" class="w-5 h-5"></i><span class="text-[8px] font-black uppercase tracking-tighter">เพิ่มออม</span>
+        <button onclick="nav('add')" id="nav-add" class="nav-btn flex flex-col items-center gap-1 p-3 text-slate-400">
+            <i data-lucide="plus-square" class="w-5 h-5"></i><span class="text-[8px] font-black uppercase">Save</span>
         </button>
-        <button onclick="nav('pockets')" id="nav-pockets" class="nav-btn flex flex-col items-center gap-1 p-2 text-slate-400">
-            <i data-lucide="wallet" class="w-5 h-5"></i><span class="text-[8px] font-black uppercase tracking-tighter">Pockets 👛</span>
+        <button onclick="nav('pockets')" id="nav-pockets" class="nav-btn flex flex-col items-center gap-1 p-3 text-slate-400">
+            <i data-lucide="wallet" class="w-5 h-5"></i><span class="text-[8px] font-black uppercase">Pockets</span>
         </button>
-        <button onclick="nav('tools')" id="nav-tools" class="nav-btn flex flex-col items-center gap-1 p-2 text-slate-400">
-            <i data-lucide="calculator" class="w-5 h-5"></i><span class="text-[8px] font-black uppercase tracking-tighter">เครื่องมือ</span>
+        <button onclick="nav('calc')" id="nav-calc" class="nav-btn flex flex-col items-center gap-1 p-3 text-slate-400">
+            <i data-lucide="calculator" class="w-5 h-5"></i><span class="text-[8px] font-black uppercase">Tools</span>
         </button>
-        <button onclick="nav('chat')" id="nav-chat" class="nav-btn flex flex-col items-center gap-1 p-2 text-slate-400">
-            <i data-lucide="sparkles" class="w-5 h-5"></i><span class="text-[8px] font-black uppercase tracking-tighter">AI วิเคราะห์</span>
+        <button onclick="nav('chat')" id="nav-chat" class="nav-btn flex flex-col items-center gap-1 p-3 text-slate-400">
+            <i data-lucide="bot" class="w-5 h-5"></i><span class="text-[8px] font-black uppercase">AI Chat</span>
         </button>
-        <button onclick="nav('settings')" id="nav-settings" class="nav-btn flex flex-col items-center gap-1 p-2 text-slate-400">
-            <i data-lucide="user" class="w-5 h-5"></i><span class="text-[8px] font-black uppercase tracking-tighter">ตั้งค่า</span>
+        <button onclick="nav('settings')" id="nav-settings" class="nav-btn flex flex-col items-center gap-1 p-3 text-slate-400">
+            <i data-lucide="cog" class="w-5 h-5"></i><span class="text-[8px] font-black uppercase">Setting</span>
         </button>
     </nav>
 
@@ -290,34 +308,41 @@
             transactions: [],
             goals: [],
             completedGoals: [],
-            config: { level: 1, xp: 0, manualBalance: 0, lastEdit: '', goalEditLog: {} }
+            config: { 
+                level: 1, 
+                xp: 0, 
+                manualBalance: 0,
+                lastBalanceEditDate: '',
+                lastGoalEditDate: '',
+                goalEditCount: 0 
+            }
         };
 
         const ranks = ["BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND", "LEGEND"];
         let chart;
-        let selectedCategory = 'ทั่วไป';
         let navVisible = true;
 
-        // --- Core Functions ---
         async function init() {
             updateTime();
             setInterval(updateTime, 1000);
             initChart();
             await loadFromCloud();
-            runAIAnalyzer();
+            runAIProcessor();
             lucide.createIcons();
         }
 
         function updateTime() {
             const now = new Date();
-            document.getElementById('currentDateTime').innerText = now.toLocaleString('th-TH', { 
+            const el = document.getElementById('currentDateTime');
+            if (el) el.innerText = now.toLocaleString('th-TH', { 
                 day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' 
             });
         }
 
         function toggleNav() {
             navVisible = !navVisible;
-            document.getElementById('bottomNav').classList.toggle('nav-hidden', !navVisible);
+            const nav = document.getElementById('bottomNav');
+            nav.classList.toggle('nav-hidden', !navVisible);
         }
 
         function nav(pageId) {
@@ -325,43 +350,45 @@
             setTimeout(() => {
                 document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
                 document.getElementById(`page-${pageId}`).classList.remove('hidden');
-                
                 document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
                 document.getElementById(`nav-${pageId}`).classList.add('nav-active');
-                
                 document.getElementById('loadingOverlay').style.display = 'none';
                 lucide.createIcons();
-                if(pageId === 'dashboard') runAIAnalyzer();
+                if(pageId === 'dashboard') runAIProcessor();
             }, 3000);
         }
 
-        // --- JSONP Cloud Engine ---
+        // JSONP Implementation for Cross-Origin
         function cloudRequest(action, payload) {
             return new Promise((resolve) => {
-                const callbackName = 'cb_' + Date.now();
-                window[callbackName] = (res) => {
-                    delete window[callbackName];
-                    document.getElementById(callbackName).remove();
+                const cb = 'callback_' + Math.floor(Math.random() * 1000000);
+                window[cb] = (res) => {
+                    delete window[cb];
+                    document.getElementById(cb)?.remove();
                     resolve(res);
                 };
                 const script = document.createElement('script');
-                script.id = callbackName;
-                script.src = `${SCRIPT_URL}?action=${action}&callback=${callbackName}&data=${encodeURIComponent(JSON.stringify(payload))}`;
+                script.id = cb;
+                script.src = `${SCRIPT_URL}?action=${action}&callback=${cb}&data=${encodeURIComponent(JSON.stringify(payload))}`;
                 document.body.appendChild(script);
             });
         }
 
         async function loadFromCloud() {
-            const res = await cloudRequest('load', {});
-            if (res && res.data) {
-                const cloud = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
-                state = {
-                    transactions: cloud.transactions || [],
-                    goals: cloud.goals || [],
-                    completedGoals: cloud.completedGoals || [],
-                    config: { ...state.config, ...cloud.config }
-                };
-            }
+            try {
+                const res = await cloudRequest('load', {});
+                if (res && res.data) {
+                    let cloud = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
+                    if (cloud) {
+                        state = {
+                            transactions: cloud.transactions || [],
+                            goals: cloud.goals || [],
+                            completedGoals: cloud.completedGoals || [],
+                            config: { ...state.config, ...cloud.config }
+                        };
+                    }
+                }
+            } catch (e) { console.error("Load Error", e); }
             renderAll();
         }
 
@@ -369,19 +396,54 @@
             await cloudRequest('save', state);
         }
 
-        // --- UI Rendering ---
-        function renderAll() {
-            const transTotal = state.transactions.reduce((acc, t) => acc + (parseFloat(t.amount) || 0), 0);
-            const balance = transTotal + (parseFloat(state.config.manualBalance) || 0);
+        function runAIProcessor() {
+            const aiInsight = document.getElementById('aiInsight');
+            const savingRate = document.getElementById('savingRate');
+            const pocketStatus = document.getElementById('pocketStatus');
             
-            document.getElementById('totalBalance').innerText = `฿${balance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-            document.getElementById('activeGoalCount').innerText = state.goals.length;
+            setTimeout(() => {
+                const total = state.transactions.reduce((acc, t) => acc + (parseFloat(t.amount) || 0), 0) + (parseFloat(state.config.manualBalance) || 0);
+                const avg = total / (state.transactions.length || 1);
+                
+                aiInsight.innerText = total > 5000 ? `"ยอดออม ฿${total.toLocaleString()} ถือว่ายอดเยี่ยมมาก! คุณกำลังเข้าสู่ยศระดับสูง แนะนำให้เพิ่ม Pocket สำหรับการลงทุนระยะยาว"` : 
+                                      `"เริ่มต้นได้ดีครับ ยอดออมสะสมของคุณคือ ฿${total.toLocaleString()} ลองใช้โหมดประหยัดเพื่อเร่งระดับเลเวลดูนะครับ"`;
+                
+                savingRate.innerText = `฿${avg.toFixed(2)} / รายการ`;
+                pocketStatus.innerText = state.goals.length > 0 ? `${state.goals.length} กระเป๋าเปิดอยู่` : 'ยังไม่มีกระเป๋า';
+                
+                updateRankAndLevel(total);
+            }, 10000);
+        }
+
+        function updateRankAndLevel(total) {
+            const newLv = Math.max(1, Math.floor(total / 1000) + 1);
+            if(newLv > state.config.level) {
+                state.config.level = newLv;
+                Swal.fire({ title: 'LEVEL UP!', text: `ยินดีด้วย! คุณเลเวล ${newLv} แล้ว`, icon: 'success', toast: true, position: 'top-end' });
+            }
+            renderAll();
+        }
+
+        function renderAll() {
+            const totalTrans = state.transactions.reduce((acc, t) => acc + (parseFloat(t.amount) || 0), 0);
+            const total = totalTrans + (parseFloat(state.config.manualBalance) || 0);
+            
+            document.getElementById('totalBalance').innerText = `฿${total.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
             document.getElementById('lvDisplay').innerText = state.config.level;
-            document.getElementById('xpPercentDisplay').innerText = state.config.xp;
             document.getElementById('xpBar').style.width = `${state.config.xp}%`;
             
-            const rIdx = Math.min(Math.floor((state.config.level - 1) / 2), 5);
-            document.getElementById('rankBadge').innerText = ranks[rIdx];
+            const rankIdx = Math.min(Math.floor((state.config.level - 1) / 5), 5);
+            const rankBadge = document.getElementById('rankBadge');
+            rankBadge.innerText = ranks[rankIdx];
+            
+            // Pocket Progress calculation
+            const goalActive = state.goals.length;
+            if(goalActive > 0) {
+                const sumProgress = state.goals.reduce((acc, g) => acc + (Math.min((total / (g.target || 1)) * 100, 100)), 0);
+                document.getElementById('goalProgressCount').innerText = `${(sumProgress / goalActive).toFixed(0)}%`;
+            } else {
+                document.getElementById('goalProgressCount').innerText = '0%';
+            }
 
             renderHistory();
             renderGoals();
@@ -392,38 +454,43 @@
         function renderHistory() {
             const list = document.getElementById('historyList');
             if(state.transactions.length === 0) {
-                list.innerHTML = '<p class="text-center text-[10px] py-6 text-slate-400">ไม่มีข้อมูลการออม</p>';
+                list.innerHTML = '<p class="text-center text-[10px] py-6 text-slate-400 font-bold">ไม่มีรายการออม</p>';
                 return;
             }
-            list.innerHTML = state.transactions.slice().reverse().slice(0, 5).map(t => `
-                <div class="flex items-center justify-between p-3 bg-white border border-orange-50 rounded-2xl shadow-sm">
-                    <div class="flex gap-2">
-                        <div class="p-2 bg-orange-50 text-orange-600 rounded-xl"><i data-lucide="tag" class="w-3 h-3"></i></div>
-                        <div><p class="text-[10px] font-black text-orange-900">${t.category}</p><p class="text-[8px] text-slate-400">${t.date}</p></div>
+            list.innerHTML = state.transactions.slice(-5).reverse().map(t => `
+                <div class="flex items-center justify-between p-4 bg-orange-50/50 rounded-2xl border border-orange-100">
+                    <div class="flex gap-3 items-center">
+                        <div class="p-2 bg-white rounded-xl shadow-sm"><i data-lucide="arrow-up-right" class="w-4 h-4 text-orange-500"></i></div>
+                        <div>
+                            <p class="text-[10px] font-black text-orange-900 uppercase">${t.category}</p>
+                            <p class="text-[8px] text-slate-400 font-bold">${t.date}</p>
+                        </div>
                     </div>
-                    <span class="text-xs font-black text-orange-600">+฿${parseFloat(t.amount).toLocaleString()}</span>
+                    <span class="text-sm font-black text-orange-600">+฿${parseFloat(t.amount).toLocaleString()}</span>
                 </div>
             `).join('');
         }
 
         function renderGoals() {
             const list = document.getElementById('goalList');
+            const totalSaved = state.transactions.reduce((acc, t) => acc + (parseFloat(t.amount) || 0), 0) + (parseFloat(state.config.manualBalance) || 0);
+            
             list.innerHTML = state.goals.map((g, idx) => {
-                const progress = Math.min((g.saved / g.target) * 100, 100);
+                const progress = Math.min((totalSaved / (g.target || 1)) * 100, 100);
                 return `
-                    <div class="glass-card p-5 space-y-3">
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs font-black text-orange-950">${g.title}</span>
+                    <div class="glass-card p-6 border-l-8 border-cyan-500 shadow-lg">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm font-black text-cyan-900">${g.title}</span>
                             <div class="flex gap-2">
-                                <button onclick="addToPocket(${idx})" class="p-1 text-sky-500"><i data-lucide="plus-circle" class="w-4 h-4"></i></button>
-                                <button onclick="editGoal(${idx})" class="p-1 text-orange-300"><i data-lucide="settings" class="w-3 h-3"></i></button>
+                                <button onclick="editGoal(${idx})" class="p-1.5 bg-cyan-50 text-cyan-600 rounded-lg"><i data-lucide="edit-3" class="w-3 h-3"></i></button>
+                                ${progress >= 100 ? `<button onclick="completeGoal(${idx})" class="p-1.5 bg-green-50 text-green-600 rounded-lg"><i data-lucide="check-circle" class="w-3 h-3"></i></button>` : ''}
                             </div>
                         </div>
-                        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                            <div class="bg-sky-500 h-full transition-all duration-1000" style="width: ${progress}%"></div>
+                        <div class="w-full bg-cyan-50 h-3 rounded-full overflow-hidden mb-2">
+                            <div class="bg-gradient-to-r from-cyan-500 to-blue-400 h-full" style="width: ${progress}%"></div>
                         </div>
-                        <div class="flex justify-between text-[8px] font-black text-slate-400">
-                            <span>เก็บแล้ว ฿${g.saved.toLocaleString()} / ฿${g.target.toLocaleString()}</span>
+                        <div class="flex justify-between text-[9px] font-black text-cyan-600 uppercase">
+                            <span>฿${totalSaved.toLocaleString()} / ฿${parseFloat(g.target).toLocaleString()}</span>
                             <span>${progress.toFixed(1)}%</span>
                         </div>
                     </div>
@@ -432,49 +499,25 @@
 
             const compList = document.getElementById('completedGoalList');
             compList.innerHTML = state.completedGoals.map((g, idx) => `
-                <div class="flex justify-between items-center p-3 bg-white border border-green-100 rounded-xl">
-                    <span class="text-[9px] font-bold text-green-700">${g.title} - สำเร็จแล้ว</span>
-                    <button onclick="deleteCompleted(${idx})" class="text-red-300"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                <div class="flex justify-between items-center p-3 bg-white rounded-xl border border-green-100 opacity-60">
+                    <span class="text-[9px] font-bold text-slate-600">${g.title}</span>
+                    <button onclick="deleteCompletedGoal(${idx})" class="text-rose-400"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
                 </div>
             `).join('');
         }
 
-        // --- Logic Functions ---
-        async function runAIAnalyzer() {
-            const insight = document.getElementById('aiInsight');
-            const stats = document.getElementById('analysisStats');
-            insight.innerText = '"AI-X4.0 กำลังวิเคราะห์ข้อมูลการออมจริงของคุณ..."';
-            
-            setTimeout(() => {
-                const total = state.transactions.reduce((acc, t) => acc + (parseFloat(t.amount) || 0), 0);
-                const avg = total > 0 ? (total / Math.max(state.transactions.length, 1)).toFixed(2) : 0;
-                
-                insight.innerText = total === 0 ? "ระบบเริ่มต้นใหม่: ยินดีต้อนรับสู่หน้าร้อน 2026 เริ่มออมเพื่ออัปยศของคุณได้เลย!" :
-                    `วิเคราะห์สำเร็จ: คุณมีการออมเฉลี่ยรายการละ ฿${avg} ยศปัจจุบันคือ ${ranks[Math.min(Math.floor((state.config.level-1)/2), 5)]} แนะนำให้ออมต่อเนื่องเพื่ออัปเลเวลครับ!`;
-                
-                stats.innerHTML = `
-                    <span class="text-[9px] bg-black/10 px-3 py-1 rounded-full font-bold">🎯 เป้าหมาย: ${state.goals.length}</span>
-                    <span class="text-[9px] bg-black/10 px-3 py-1 rounded-full font-bold">⭐ เลเวล: ${state.config.level}</span>
-                `;
-            }, 10000);
-        }
-
-        function setCategory(cat) {
-            selectedCategory = cat;
-            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('bg-orange-500', 'text-white'));
-            document.getElementById(`cat-${cat}`).classList.add('bg-orange-500', 'text-white');
-        }
-
+        // Transactions Logic
         const saveForm = document.getElementById('saveForm');
         saveForm.onsubmit = async (e) => {
             e.preventDefault();
             const amt = parseFloat(document.getElementById('amount').value);
+            const cat = document.getElementById('category').value;
             if(isNaN(amt) || amt <= 0) return;
 
             Swal.fire({ title: 'กำลังบันทึกลง Cloud...', didOpen: () => Swal.showLoading() });
             
-            state.transactions.push({ amount: amt, category: selectedCategory, date: new Date().toLocaleString('th-TH') });
-            state.config.xp += 15;
+            state.transactions.push({ amount: amt, category: cat, date: new Date().toLocaleString('th-TH') });
+            state.config.xp = (state.config.xp || 0) + 20;
             if(state.config.xp >= 100) { state.config.level++; state.config.xp = 0; }
             
             await saveToCloud();
@@ -485,160 +528,197 @@
 
         async function editManualBalance() {
             const today = new Date().toLocaleDateString();
-            if(state.config.lastEdit === today) {
-                Swal.fire('จำกัด!', 'คุณแก้ไขยอดเงินไปแล้ว 1 ครั้งสำหรับวันนี้', 'warning');
-                return;
+            if(state.config.lastBalanceEditDate === today) {
+                return Swal.fire('จำกัด!', 'คุณแก้ไขยอดเงินไปแล้วในวันนี้ แก้ไขใหม่ได้วันพรุ่งนี้ครับ', 'warning');
             }
 
             const { value: val } = await Swal.fire({
-                title: 'ปรับปรุงเงินออมสุทธิ',
+                title: 'แก้ไขเงินออมสุทธิ',
                 input: 'number',
                 inputValue: state.config.manualBalance,
                 showCancelButton: true
             });
 
-            if(val !== null && val !== undefined) {
-                state.config.manualBalance = parseFloat(val) || 0;
-                state.config.lastEdit = today;
+            if(val) {
+                state.config.manualBalance = parseFloat(val);
+                state.config.lastBalanceEditDate = today;
                 await saveToCloud();
                 renderAll();
+                Swal.fire('สำเร็จ', 'ปรับปรุงยอดเงินออมสุทธิแล้ว', 'success');
             }
         }
 
-        // --- Pocket 2.0 Functions ---
+        // Pockets Logic
         async function addGoal() {
-            const t = document.getElementById('goalTitle').value;
+            const title = document.getElementById('goalTitle').value;
             const target = parseFloat(document.getElementById('goalTarget').value);
-            if(!t || isNaN(target)) return;
+            if(!title || isNaN(target)) return;
 
-            state.goals.push({ title: t, target: target, saved: 0 });
+            state.goals.push({ title, target });
             await saveToCloud();
             document.getElementById('goalTitle').value = '';
             document.getElementById('goalTarget').value = '';
             renderAll();
-        }
-
-        async function addToPocket(idx) {
-            const { value: amt } = await Swal.fire({
-                title: 'ออมเข้า Pocket',
-                input: 'number',
-                inputPlaceholder: 'จำนวนเงิน'
-            });
-            if(!amt) return;
-
-            state.goals[idx].saved += parseFloat(amt);
-            if(state.goals[idx].saved >= state.goals[idx].target) {
-                const g = state.goals.splice(idx, 1)[0];
-                state.completedGoals.push(g);
-                Swal.fire('ยินดีด้วย!', `คุณทำเป้าหมาย ${g.title} สำเร็จแล้ว!`, 'success');
-            }
-            await saveToCloud();
-            renderAll();
+            Swal.fire('เปิด Pocket สำเร็จ!', '', 'success');
         }
 
         async function editGoal(idx) {
             const today = new Date().toLocaleDateString();
-            state.config.goalEditLog[today] = state.config.goalEditLog[today] || 0;
-            
-            if(state.config.goalEditLog[today] >= 2) {
-                Swal.fire('จำกัด!', 'คุณแก้ไขเป้าหมายครบ 2 ครั้งต่อวันแล้ว', 'error');
-                return;
+            if(state.config.lastGoalEditDate !== today) {
+                state.config.goalEditCount = 0;
+                state.config.lastGoalEditDate = today;
             }
 
-            const { value: form } = await Swal.fire({
-                title: 'แก้ไขเป้าหมาย',
-                html: `<input id="s-title" class="swal2-input" value="${state.goals[idx].title}">
-                       <input id="s-target" type="number" class="swal2-input" value="${state.goals[idx].target}">`,
-                showCancelButton: true
+            if(state.config.goalEditCount >= 2) {
+                return Swal.fire('จำกัด!', 'คุณแก้ไข Pocket ครบ 2 ครั้งแล้วในวันนี้ครับ', 'warning');
+            }
+
+            const { value: formValues } = await Swal.fire({
+                title: 'แก้ไข Pocket',
+                html: `<input id="swal-g-t" class="swal2-input" value="${state.goals[idx].title}">
+                       <input id="swal-g-a" type="number" class="swal2-input" value="${state.goals[idx].target}">`,
+                focusConfirm: false,
+                preConfirm: () => [document.getElementById('swal-g-t').value, document.getElementById('swal-g-a').value]
             });
 
-            if(form) {
-                state.goals[idx].title = document.getElementById('s-title').value;
-                state.goals[idx].target = parseFloat(document.getElementById('s-target').value);
-                state.config.goalEditLog[today]++;
+            if(formValues) {
+                state.goals[idx].title = formValues[0];
+                state.goals[idx].target = parseFloat(formValues[1]);
+                state.config.goalEditCount++;
                 await saveToCloud();
                 renderAll();
             }
         }
 
-        async function deleteCompleted(idx) {
+        async function completeGoal(idx) {
+            const g = state.goals.splice(idx, 1)[0];
+            state.completedGoals.push(g);
+            await saveToCloud();
+            renderAll();
+            Swal.fire('เป้าหมายสำเร็จ!', `คุณทำเป้าหมาย "${g.title}" สำเร็จแล้ว!`, 'success');
+        }
+
+        async function deleteCompletedGoal(idx) {
             state.completedGoals.splice(idx, 1);
             await saveToCloud();
             renderAll();
         }
 
-        // --- Calculator 2026 ---
-        let calcVal = '0';
-        function calcNum(n) { calcVal === '0' ? calcVal = n : calcVal += n; document.getElementById('calcDisplay').innerText = calcVal; }
-        function calcOp(op) { calcVal += op; document.getElementById('calcDisplay').innerText = calcVal; }
-        function calcClear() { calcVal = '0'; document.getElementById('calcDisplay').innerText = '0'; }
-        function calcDel() { calcVal = calcVal.length > 1 ? calcVal.slice(0,-1) : '0'; document.getElementById('calcDisplay').innerText = calcVal; }
-        function calcEqual() { 
-            try { 
-                const res = eval(calcVal);
-                document.getElementById('calcHistory').innerText = calcVal + ' =';
-                calcVal = res.toString();
-                document.getElementById('calcDisplay').innerText = calcVal;
-            } catch { calcVal = 'Error'; document.getElementById('calcDisplay').innerText = 'Error'; }
+        // Tools Logic
+        function calc(v) {
+            const display = document.getElementById('calcDisplay');
+            if(v === 'C') display.value = '0';
+            else if(v === '=') {
+                try { display.value = eval(display.value); } catch(e) { display.value = 'Error'; }
+            } else {
+                if(display.value === '0') display.value = v;
+                else display.value += v;
+            }
         }
 
-        function forecast(days) {
-            const daily = parseFloat(document.getElementById('calcDaily').value);
-            if(isNaN(daily)) return;
-            const total = daily * days;
-            const el = document.getElementById('forecastResult');
-            el.innerText = `หากออมวันละ ฿${daily.toLocaleString()} เป็นเวลา ${days} วัน คุณจะมีเงินเก็บทั้งหมด ฿${total.toLocaleString()} บาท`;
-            el.classList.remove('hidden');
+        function calculatePlan() {
+            const target = parseFloat(document.getElementById('planTarget').value);
+            const days = parseFloat(document.getElementById('planDays').value);
+            const res = document.getElementById('planResult');
+            if(isNaN(target) || isNaN(days)) return;
+            
+            const perDay = target / days;
+            res.classList.remove('hidden');
+            res.innerHTML = `คุณต้องออมวันละ <span class="text-xl font-black">฿${perDay.toLocaleString(undefined, {maximumFractionDigits:2})}</span><br>เพื่อให้ถึงเป้าหมายใน ${days} วัน`;
         }
 
-        // --- Chat AI ---
+        // AI Chat Logic (AI-X4.0 Logic)
         function handleChat() {
             const input = document.getElementById('chatInput');
-            const box = document.getElementById('chatBox');
-            const q = input.value.trim();
-            if(!q) return;
+            const text = input.value.trim();
+            if(!text) return;
 
-            box.innerHTML += `<div class="bg-orange-500 text-white p-3 rounded-2xl rounded-tr-none text-xs self-end ml-auto max-w-[80%]">${q}</div>`;
+            const box = document.getElementById('chatBox');
+            box.innerHTML += `<div class="bg-orange-600 text-white p-4 rounded-3xl rounded-tr-none text-sm self-end ml-auto max-w-[80%] shadow-md">${text}</div>`;
             input.value = '';
 
             setTimeout(() => {
-                let ans = "AI-X4.0 ยังไม่เข้าใจคำถามนี้ครับ ลองถามเรื่อง 'สรุป', 'เลเวล', 'ยศ' หรือ 'คู่มือ' ดูนะ";
+                let ans = "AI-X4.0 ไม่พบข้อมูลแน่ชัด ลองถามเรื่อง 'ยอดเงิน' 'เลเวล' 'ยศ' หรือ 'คู่มือ' ครับ";
                 const total = state.transactions.reduce((acc, t) => acc + (parseFloat(t.amount) || 0), 0) + (parseFloat(state.config.manualBalance) || 0);
                 
-                if(q.includes('สรุป') || q.includes('เงิน')) ans = `ยอดเงินรวมปัจจุบันของคุณคือ ฿${total.toLocaleString()} บาทครับ`;
-                else if(q.includes('เลเวล')) ans = `คุณอยู่เลเวล ${state.config.level} (${state.config.xp}%) ครับ อีกไม่ไกลเลเวลก็จะเพิ่มแล้ว!`;
-                else if(q.includes('ยศ')) ans = `ยศของคุณคือ ${ranks[Math.min(Math.floor((state.config.level-1)/2), 5)]} ครับ`;
-                else if(q.includes('คู่มือ')) ans = "คู่มือ: 1.หน้าหลักดูภาพรวม 2.เพิ่มออมใช้บันทึก 3.Pockets แยกเป้าหมาย 4.Settings สำหรับรีเซ็ต";
+                const q = text.toLowerCase();
+                if(q.includes('ยอด') || q.includes('เงิน')) ans = `ยอดออมรวมทั้งหมดของคุณคือ ฿${total.toLocaleString()} ครับ เป็นเงินออมจากรายการ ฿${(total - state.config.manualBalance).toLocaleString()} และเงินออมสุทธิ ฿${state.config.manualBalance.toLocaleString()}`;
+                else if(q.includes('เลเวล') || q.includes('xp')) ans = `ขณะนี้คุณเลเวล ${state.config.level} หลอดประสบการณ์อยู่ที่ ${state.config.xp}% ครับ ออมอีกเพียงเล็กน้อยเพื่อเลเวลถัดไป!`;
+                else if(q.includes('ยศ')) {
+                    const rankIdx = Math.min(Math.floor((state.config.level - 1) / 5), 5);
+                    ans = `ยศปัจจุบันของคุณคือ "${ranks[rankIdx]}" ยศสูงสุดคือ LEGEND ครับ สู้ๆ!`;
+                }
+                else if(q.includes('คู่มือ') || q.includes('ใช้งาน')) ans = "คู่มือ: กด Home เพื่อดูภาพรวม | Save เพื่อบันทึกออม | Pockets เพื่อออมตามเป้าหมาย | Tools เพื่อคำนวณเงิน | กดโลโก้เพื่อซ่อนเมนูบาร์ครับ";
+                else if(q.includes('เป้าหมาย')) ans = state.goals.length > 0 ? `คุณมี ${state.goals.length} เป้าหมายที่กำลังออมอยู่ แนะนำให้ออมสม่ำเสมอเพื่อปิด Pocket ครับ` : "คุณยังไม่ได้สร้างเป้าหมายในหน้า Pockets เลยครับ";
 
-                box.innerHTML += `<div class="bg-white p-3 rounded-2xl rounded-tl-none border border-orange-50 text-xs shadow-sm"><p class="font-black text-orange-600">AI-X4.0</p>${ans}</div>`;
+                box.innerHTML += `<div class="bg-white p-5 rounded-3xl rounded-tl-none border border-orange-100 shadow-sm text-sm"><p class="font-black text-orange-600 mb-1">AI-X4.0 Assistant 🤖</p>${ans}</div>`;
                 box.scrollTop = box.scrollHeight;
-            }, 600);
-        }
-
-        async function wipeAllData() {
-            const res = await Swal.fire({ title: 'ล้างข้อมูลทั้งหมด?', text: "ข้อมูลใน Cloud จะหายถาวร!", icon: 'warning', showCancelButton: true });
-            if(res.isConfirmed) {
-                Swal.fire({ title: 'กำลังล้าง Cloud...', didOpen: () => Swal.showLoading() });
-                await cloudRequest('wipe', {});
-                location.reload();
-            }
+            }, 800);
         }
 
         function initChart() {
             const ctx = document.getElementById('mainChart').getContext('2d');
             chart = new Chart(ctx, {
                 type: 'line',
-                data: { labels: ['','','','','','',''], datasets: [{ data: [0,0,0,0,0,0,0], borderColor: '#f97316', fill: true, backgroundColor: 'rgba(249, 115, 22, 0.1)', tension: 0.4 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { display: false } } }
+                data: {
+                    labels: ['Day 1','Day 2','Day 3','Day 4','Day 5','Day 6','Day 7'],
+                    datasets: [{
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                        borderColor: '#ff8c00',
+                        borderWidth: 4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#ff8c00',
+                        pointBorderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(255, 140, 0, 0.1)'
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { legend: { display: false } }, 
+                    scales: { 
+                        x: { display: false }, 
+                        y: { 
+                            grid: { color: '#fff3e0' }, 
+                            border: { display: false },
+                            ticks: { font: { weight: 'bold', size: 9 } }
+                        } 
+                    } 
+                }
             });
         }
 
         function updateChart() {
             if(!chart) return;
-            const data = state.transactions.slice(-7).map(t => parseFloat(t.amount));
-            while(data.length < 7) data.unshift(0);
-            chart.data.datasets[0].data = data;
+            const history = state.transactions.slice(-7).map(t => parseFloat(t.amount));
+            while(history.length < 7) history.unshift(0);
+            chart.data.datasets[0].data = history;
             chart.update();
+        }
+
+        async function hardReset() {
+            const res = await Swal.fire({
+                title: 'ยืนยันล้างข้อมูลทั้งหมด?',
+                text: "ข้อมูลใน Cloud และเครื่องของคุณจะหายถาวร ไม่สามารถกู้คืนได้!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e11d48',
+                confirmButtonText: 'ล้างข้อมูลเดี๋ยวนี้'
+            });
+
+            if(res.isConfirmed) {
+                Swal.fire({ title: 'กำลังลบข้อมูลจาก Cloud...', didOpen: () => Swal.showLoading() });
+                await cloudRequest('wipe', {});
+                state = { 
+                    transactions: [], goals: [], completedGoals: [], 
+                    config: { level: 1, xp: 0, manualBalance: 0, lastBalanceEditDate: '', lastGoalEditDate: '', goalEditCount: 0 } 
+                };
+                renderAll();
+                Swal.fire('ลบข้อมูลเรียบร้อย', 'ระบบถูกเริ่มต้นใหม่ทั้งหมดแล้ว', 'success');
+                nav('dashboard');
+            }
         }
 
         window.onload = init;
