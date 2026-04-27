@@ -2,703 +2,727 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IOTNovasave V.3.8.0 | Smart AI Saving</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IOTNovasave V.4.2.0 | Smart AI Saving</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap');
-        :root { --primary: #2563eb; --secondary: #7c3aed; }
-        body { font-family: 'Kanit', sans-serif; background-color: #f8fafc; color: #1e293b; touch-action: manipulation; }
-        .glass { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); }
-        .loading-screen { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; transition: opacity 0.5s; }
-        .sidebar { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: fixed; top: 0; left: 0; height: 100%; width: 280px; z-index: 60; background: white; box-shadow: 10px 0 30px rgba(0,0,0,0.05); transform: translateX(-100%); }
+        body { font-family: 'Kanit', sans-serif; background-color: #f8fafc; color: #1e293b; transition: all 0.3s; }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(226, 232, 240, 0.8); }
+        .sidebar { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: fixed; top: 0; left: 0; height: 100%; width: 280px; z-index: 100; background: white; box-shadow: 10px 0 30px rgba(0,0,0,0.05); transform: translateX(-100%); }
         .sidebar.open { transform: translateX(0); }
-        .nav-btn { transition: all 0.2s; position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px; color: #94a3b8; }
-        .nav-btn.active { color: var(--primary); font-weight: 600; }
-        .nav-btn.active i { transform: translateY(-2px); }
-        .rank-badge { padding: 4px 14px; border-radius: 99px; font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.5s; }
-        .rank-bronze { background: #fee2e2; color: #991b1b; }
-        .rank-silver { background: #f1f5f9; color: #475569; }
-        .rank-gold { background: #fefce8; color: #854d0e; }
-        .rank-regen { background: linear-gradient(45deg, #7c3aed, #2563eb); color: white; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3); animation: glow 2s infinite alternate; }
-        @keyframes glow { from { filter: brightness(1); } to { filter: brightness(1.2); } }
+        .nav-btn { transition: all 0.2s; position: relative; }
+        .nav-btn.active { color: #2563eb; font-weight: 600; }
+        .nav-btn.active::after { content: ''; position: absolute; top: 0; width: 4px; height: 100%; background: #2563eb; left: 0; border-radius: 0 4px 4px 0; }
+        .loading-screen { position: fixed; inset: 0; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; }
+        .rank-badge { padding: 4px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
+        .rank-bronze { background: #fed7aa; color: #9a3412; }
+        .rank-silver { background: #e2e8f0; color: #475569; }
+        .rank-gold { background: #fef08a; color: #854d0e; }
+        .rank-regen { background: linear-gradient(45deg, #ec4899, #8b5cf6); color: white; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
         .page { animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        .pocket-card { background: white; border-radius: 2rem; padding: 1.5rem; border: 1px solid #f1f5f9; transition: all 0.3s; }
-        .pocket-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="pb-24">
 
-    <!-- Loading Screen (3s) -->
+    <!-- Loading Screen -->
     <div id="loader" class="loading-screen">
-        <div class="relative w-24 h-24">
-            <div class="absolute inset-0 border-4 border-blue-50 rounded-full"></div>
+        <div class="relative w-20 h-20">
+            <div class="absolute inset-0 border-4 border-blue-100 rounded-full"></div>
             <div class="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
-            <div class="absolute inset-0 flex items-center justify-center">
-                <i data-lucide="zap" class="text-blue-600 animate-pulse"></i>
-            </div>
         </div>
-        <p class="mt-8 font-semibold text-gray-400 tracking-widest text-sm uppercase">Initializing AI-X11 System...</p>
+        <p class="mt-6 font-semibold text-blue-600 animate-pulse">กำลังโหลดระบบ (3 วิ)...</p>
     </div>
 
-    <!-- Top Bar -->
-    <header class="glass fixed top-0 w-full z-50 p-4 flex justify-between items-center shadow-sm">
+    <!-- Header -->
+    <header class="glass fixed top-0 w-full z-50 px-5 py-4 flex justify-between items-center shadow-sm">
         <div class="flex items-center gap-3">
-            <button onclick="toggleSidebar(true)" class="p-2.5 bg-blue-50 rounded-2xl text-blue-600 hover:bg-blue-100 transition shadow-inner">
+            <button onclick="toggleSidebar()" class="p-2 hover:bg-gray-100 rounded-2xl transition-all active:scale-90 bg-blue-50 text-blue-600" id="menu-trigger">
                 <i data-lucide="layout-grid" class="w-6 h-6"></i>
             </button>
             <div class="flex flex-col">
                 <div class="flex items-center gap-2">
-                    <span class="font-black text-xl tracking-tighter text-gray-800">IOTNovasave</span>
-                    <button onclick="location.reload()" class="p-1 hover:bg-gray-100 rounded-lg active:rotate-180 transition-transform duration-500">
-                        <i data-lucide="refresh-cw" class="w-4 h-4 text-gray-300"></i>
+                    <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">IOTNovasave</h1>
+                    <button onclick="location.reload()" class="p-1 hover:rotate-180 transition-transform duration-500 text-gray-400">
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                     </button>
                 </div>
-                <span id="current-time" class="text-[10px] text-gray-400 font-bold uppercase tracking-wider"></span>
+                <span class="text-[10px] text-gray-400 font-mono">STABLE V.4.2.0</span>
             </div>
         </div>
-        <div id="rank-display" class="rank-badge rank-bronze">BRONZE</div>
+        <div id="current-time" class="text-[11px] font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full"></div>
     </header>
 
-    <!-- Sidebar -->
+    <!-- Sidebar Menu -->
     <aside id="sidebar" class="sidebar flex flex-col">
-        <div class="p-8 flex justify-between items-center border-b">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
-                    <i data-lucide="wallet-2"></i>
+        <div class="p-8 border-b flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white">
+                    <i data-lucide="wallet"></i>
                 </div>
-                <span class="font-black text-lg">Menu Navigation</span>
+                <span class="font-bold text-lg">เมนูระบบ</span>
             </div>
-            <button onclick="toggleSidebar(false)" class="p-2 text-gray-400 hover:text-red-500 transition"><i data-lucide="x-circle"></i></button>
+            <button onclick="toggleSidebar()" class="text-gray-400"><i data-lucide="chevron-left"></i></button>
         </div>
-        <nav class="flex-1 p-6 space-y-3">
-            <button onclick="navigate('dashboard')" class="w-full flex items-center gap-4 p-4 hover:bg-blue-50 rounded-2xl transition group">
-                <i data-lucide="home" class="group-hover:text-blue-600"></i> <span class="font-bold text-gray-600">หน้าหลัก (Dashboard)</span>
+        <nav class="flex-1 py-6">
+            <button onclick="navigate('dashboard')" class="nav-btn w-full flex items-center gap-4 px-8 py-4 hover:bg-blue-50 transition" id="side-dashboard">
+                <i data-lucide="home"></i> <span>หน้าหลัก</span>
             </button>
-            <button onclick="navigate('add')" class="w-full flex items-center gap-4 p-4 hover:bg-blue-50 rounded-2xl transition group">
-                <i data-lucide="plus-circle" class="group-hover:text-blue-600"></i> <span class="font-bold text-gray-600">บันทึกการออม</span>
+            <button onclick="navigate('add')" class="nav-btn w-full flex items-center gap-4 px-8 py-4 hover:bg-blue-50 transition" id="side-add">
+                <i data-lucide="plus-circle"></i> <span>เพิ่มการออม</span>
             </button>
-            <button onclick="navigate('pockets')" class="w-full flex items-center gap-4 p-4 hover:bg-blue-50 rounded-2xl transition group">
-                <i data-lucide="pocket" class="group-hover:text-blue-600"></i> <span class="font-bold text-gray-600">Cloud Pockets 5.0</span>
+            <button onclick="navigate('pockets')" class="nav-btn w-full flex items-center gap-4 px-8 py-4 hover:bg-blue-50 transition" id="side-pockets">
+                <i data-lucide="package"></i> <span>Cloud Pocket 7.0</span>
             </button>
-            <button onclick="navigate('history')" class="w-full flex items-center gap-4 p-4 hover:bg-blue-50 rounded-2xl transition group">
-                <i data-lucide="history" class="group-hover:text-blue-600"></i> <span class="font-bold text-gray-600">ประวัติรายการ</span>
+            <button onclick="navigate('history')" class="nav-btn w-full flex items-center gap-4 px-8 py-4 hover:bg-blue-50 transition" id="side-history">
+                <i data-lucide="scroll-text"></i> <span>ประวัติรายการ</span>
             </button>
-            <button onclick="navigate('settings')" class="w-full flex items-center gap-4 p-4 hover:bg-blue-50 rounded-2xl transition group">
-                <i data-lucide="settings" class="group-hover:text-blue-600"></i> <span class="font-bold text-gray-600">การตั้งค่า</span>
+            <button onclick="navigate('settings')" class="nav-btn w-full flex items-center gap-4 px-8 py-4 hover:bg-blue-50 transition" id="side-settings">
+                <i data-lucide="settings"></i> <span>ตั้งค่าระบบ</span>
             </button>
         </nav>
-        <div class="p-8 border-t text-center">
-            <span class="text-[10px] font-black text-gray-300 tracking-[0.2em] uppercase">Security Verified</span>
+        <div class="p-8 border-t text-[10px] text-gray-400 uppercase tracking-widest font-bold">
+            Powered by AI-X11
         </div>
     </aside>
 
-    <!-- Content -->
-    <main class="pt-24 px-5 pb-10 max-w-lg mx-auto">
+    <!-- Main Content -->
+    <main class="pt-24 px-5 max-w-lg mx-auto">
         
         <!-- Dashboard -->
         <div id="page-dashboard" class="page space-y-6">
-            <!-- Level Card -->
-            <div class="bg-white rounded-[2.5rem] p-7 shadow-xl shadow-blue-100/40 border border-blue-50">
-                <div class="flex justify-between items-start mb-5">
+            <!-- User Profile Card -->
+            <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2rem] p-6 text-white shadow-xl shadow-blue-200">
+                <div class="flex justify-between items-start mb-6">
                     <div>
-                        <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-1">Current Status</p>
-                        <h2 class="text-3xl font-black text-gray-800">Level <span id="ui-level">1</span></h2>
+                        <p class="text-blue-100 text-xs font-light mb-1">สถานะผู้ใช้งาน</p>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-2xl font-bold tracking-tight">Level <span id="user-level">1</span></h2>
+                            <span id="rank-badge" class="rank-badge rank-bronze">Bronze</span>
+                        </div>
                     </div>
-                    <div id="ui-rank-text" class="text-blue-600 font-black text-xs tracking-widest">BRONZE</div>
+                    <div class="w-12 h-12 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center">
+                        <i data-lucide="award" class="w-6 h-6"></i>
+                    </div>
                 </div>
-                <div class="relative h-4 bg-gray-100 rounded-full overflow-hidden mb-3 shadow-inner">
-                    <div id="ui-level-bar" class="absolute h-full bg-gradient-to-r from-blue-500 to-indigo-600 transition-all duration-1000" style="width: 0%"></div>
-                </div>
-                <div class="flex justify-between text-[11px] font-black text-gray-400">
-                    <span id="ui-xp-current">0 XP</span>
-                    <span id="ui-xp-next">1,000 XP</span>
+                <div class="space-y-2">
+                    <div class="flex justify-between text-[11px] font-medium">
+                        <span>ความคืบหน้าเลเวล</span>
+                        <span id="xp-text">0%</span>
+                    </div>
+                    <div class="w-full bg-blue-900/30 h-2.5 rounded-full overflow-hidden">
+                        <div id="xp-bar" class="bg-white h-full transition-all duration-1000 shadow-[0_0_10px_rgba(255,255,255,0.5)]" style="width: 0%"></div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Stats -->
+            <!-- Stats Grid -->
             <div class="grid grid-cols-2 gap-4">
-                <div class="bg-blue-600 rounded-[2rem] p-6 text-white shadow-xl shadow-blue-200">
-                    <p class="text-blue-100 text-[10px] font-black uppercase mb-2">เงินออมสุทธิ</p>
-                    <div class="flex items-center justify-between">
-                        <h3 id="ui-total-savings" class="text-xl font-black">฿0.00</h3>
-                        <button onclick="editTotalSavings()" class="p-1.5 bg-blue-500/50 rounded-lg hover:bg-blue-400 transition"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
+                <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-gray-100">
+                    <div class="w-8 h-8 bg-green-50 text-green-600 rounded-lg flex items-center justify-center mb-3">
+                        <i data-lucide="banknote" class="w-4 h-4"></i>
                     </div>
+                    <p class="text-gray-400 text-[10px] uppercase font-bold">เงินออมสุทธิ</p>
+                    <h3 id="total-savings" class="text-xl font-bold mt-1">฿0.00</h3>
+                    <button onclick="editManualSavings()" class="text-[10px] text-blue-500 mt-2 flex items-center gap-1">
+                        <i data-lucide="edit-3" class="w-3 h-3"></i> แก้ไข (1 ครั้ง/วัน)
+                    </button>
                 </div>
-                <div class="bg-white rounded-[2rem] p-6 border border-gray-100 shadow-sm">
-                    <p class="text-gray-400 text-[10px] font-black uppercase mb-2">เป้าหมายสำเร็จ</p>
-                    <h3 id="ui-completed-goals" class="text-xl font-black text-gray-800">0</h3>
+                <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-gray-100">
+                    <div class="w-8 h-8 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center mb-3">
+                        <i data-lucide="target" class="w-4 h-4"></i>
+                    </div>
+                    <p class="text-gray-400 text-[10px] uppercase font-bold">เป้าหมายที่รอ</p>
+                    <h3 id="goal-count" class="text-xl font-bold mt-1">0</h3>
                 </div>
             </div>
 
-            <!-- AI-X11 Dashboard Insight -->
-            <div class="bg-indigo-50 rounded-[2.5rem] p-6 border border-indigo-100 relative overflow-hidden">
-                <div class="flex items-center gap-3 mb-4 relative z-10">
-                    <div class="w-10 h-10 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
-                        <i data-lucide="cpu"></i>
+            <!-- AI Intelligence Analysis -->
+            <div class="bg-white p-6 rounded-[2rem] shadow-sm border-l-4 border-blue-600">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center animate-pulse">
+                        <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
                     </div>
-                    <span class="font-black text-indigo-900 tracking-tight">AI-X11 วิเคราะห์อัจฉริยะ</span>
+                    <span class="font-bold text-sm text-blue-600">AI-X11 วิเคราะห์อัจฉริยะ</span>
                 </div>
-                <p id="ui-ai-insight" class="text-sm text-indigo-700 leading-relaxed italic relative z-10">"กำลังประมวลผลข้อมูลการออมจริงของคุณใน 5 วินาที..."</p>
-                <i data-lucide="brain" class="absolute -right-4 -bottom-4 w-24 h-24 text-indigo-200/30 rotate-12"></i>
+                <div id="ai-insight" class="text-sm text-gray-600 leading-relaxed italic">
+                    "กำลังเชื่อมต่อฐานข้อมูล Cloud... รอสักครู่"
+                </div>
             </div>
 
             <!-- Chart -->
-            <div class="bg-white rounded-[2rem] p-6 border border-gray-100 shadow-sm">
-                <h4 class="font-black text-xs text-gray-400 uppercase mb-5 flex items-center gap-2">
-                    <i data-lucide="bar-chart-3" class="text-blue-600 w-4 h-4"></i> Real-time Saving Statistics
+            <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100">
+                <h4 class="font-bold text-sm mb-4 flex items-center gap-2">
+                    <i data-lucide="bar-chart-3" class="w-4 h-4 text-blue-500"></i> สถิติการออม (7 วันล่าสุด)
                 </h4>
-                <canvas id="savingsChart"></canvas>
+                <canvas id="savingChart" height="180"></canvas>
             </div>
         </div>
 
-        <!-- Add Page -->
+        <!-- Add Saving -->
         <div id="page-add" class="page hidden space-y-6">
-            <h2 class="text-2xl font-black tracking-tight flex items-center gap-2">
-                <i data-lucide="plus-circle" class="text-blue-600"></i> บันทึกการออมใหม่
-            </h2>
-            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-50 space-y-8">
-                <div class="space-y-3 text-center">
-                    <label class="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em]">จำนวนเงิน (฿)</label>
-                    <input type="number" id="input-amount" placeholder="0.00" class="w-full bg-gray-50 p-6 rounded-3xl border-none focus:ring-4 focus:ring-blue-100 text-4xl font-black text-center text-gray-800 transition-all">
+            <div class="text-center py-4">
+                <h2 class="text-2xl font-bold text-gray-800">บันทึกเงินออม 📥</h2>
+                <p class="text-gray-400 text-sm">ข้อมูลจะถูกส่งไปยัง Cloud Sheet ทันที</p>
+            </div>
+            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm space-y-6">
+                <div>
+                    <label class="text-xs font-bold text-gray-400 uppercase mb-2 block">จำนวนเงิน (฿)</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-gray-300">฿</span>
+                        <input type="number" id="save-amount" placeholder="0.00" class="w-full pl-10 pr-4 py-5 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-blue-500 text-2xl font-bold">
+                    </div>
                 </div>
-                <div class="space-y-3">
-                    <label class="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em] ml-2">หมวดหมู่รายการ</label>
-                    <select id="input-category" class="w-full bg-gray-50 p-5 rounded-2xl border-none font-bold text-gray-600 focus:ring-4 focus:ring-blue-100 transition-all">
-                        <option value="General">ออมทั่วไป (Default)</option>
-                        <option value="Lineman">Lineman</option>
-                        <option value="SP">ShopeePay (SP)</option>
-                    </select>
+                <div>
+                    <label class="text-xs font-bold text-gray-400 uppercase mb-2 block">หมวดหมู่การออม</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="selectCat('Lineman', this)" class="cat-btn p-4 rounded-2xl border-2 border-gray-100 flex flex-col items-center gap-2 hover:border-blue-500 transition">
+                            <i data-lucide="bike" class="w-6 h-6 text-orange-500"></i>
+                            <span class="text-sm font-semibold">Lineman</span>
+                        </button>
+                        <button onclick="selectCat('SP', this)" class="cat-btn p-4 rounded-2xl border-2 border-gray-100 flex flex-col items-center gap-2 hover:border-blue-500 transition">
+                            <i data-lucide="shopping-bag" class="w-6 h-6 text-red-500"></i>
+                            <span class="text-sm font-semibold">ShopeePay</span>
+                        </button>
+                        <button onclick="selectCat('ออมทั่วไป', this)" class="cat-btn col-span-2 p-4 rounded-2xl border-2 border-gray-100 flex items-center justify-center gap-3 hover:border-blue-500 transition">
+                            <i data-lucide="wallet-2" class="w-6 h-6 text-blue-500"></i>
+                            <span class="text-sm font-semibold">ออมทั่วไป</span>
+                        </button>
+                    </div>
+                    <input type="hidden" id="selected-cat" value="ออมทั่วไป">
                 </div>
-                <button onclick="submitSaving()" class="w-full bg-blue-600 text-white p-6 rounded-[2rem] font-black shadow-2xl shadow-blue-200 active:scale-95 transition-all flex items-center justify-center gap-4">
-                    <i data-lucide="cloud-lightning"></i> บันทึกข้อมูลลง CLOUD
+                <button onclick="saveToCloud()" class="w-full bg-blue-600 text-white py-5 rounded-[1.5rem] font-bold shadow-xl shadow-blue-100 flex items-center justify-center gap-3 active:scale-95 transition">
+                    <i data-lucide="cloud-upload"></i> บันทึกลง Cloud
                 </button>
             </div>
         </div>
 
-        <!-- Pockets Page -->
+        <!-- Cloud Pockets 7.0 -->
         <div id="page-pockets" class="page hidden space-y-6">
             <div class="flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center">
-                        <i data-lucide="pocket"></i>
-                    </div>
-                    <h2 class="text-2xl font-black tracking-tight">Cloud Pockets <span class="text-blue-600">5.0</span></h2>
+                <div>
+                    <h2 class="text-2xl font-bold">Cloud Pocket 7.0 🎒</h2>
+                    <p class="text-xs text-gray-400">กระเป๋าเก็บเงินแยกเป้าหมาย</p>
                 </div>
-                <button onclick="openNewGoalModal()" class="bg-blue-600 text-white p-3 rounded-2xl shadow-lg active:scale-90 transition">
+                <button onclick="addPocketModal()" class="w-12 h-12 bg-blue-600 text-white rounded-2xl shadow-lg flex items-center justify-center active:scale-90 transition">
                     <i data-lucide="plus"></i>
                 </button>
             </div>
-            <div id="ui-goals-list" class="grid gap-5">
-                <!-- Goal Items -->
+            <div id="pocket-list" class="space-y-4">
+                <!-- Pockets load here -->
             </div>
         </div>
 
-        <!-- History Page -->
-        <div id="page-history" class="page hidden space-y-6">
-            <h2 class="text-2xl font-black tracking-tight flex items-center gap-2">
-                <i data-lucide="list-checks" class="text-blue-600"></i> ประวัติรายการทั้งหมด
-            </h2>
-            <div id="ui-history-list" class="space-y-4">
-                <!-- History Items -->
+        <!-- History -->
+        <div id="page-history" class="page hidden space-y-4">
+            <h2 class="text-2xl font-bold">ประวัติรายการ 📋</h2>
+            <div class="bg-white rounded-[2rem] shadow-sm overflow-hidden border">
+                <div class="max-h-[60vh] overflow-y-auto">
+                    <table class="w-full text-left">
+                        <thead class="sticky top-0 bg-gray-50 text-[10px] uppercase font-bold text-gray-400 border-b">
+                            <tr>
+                                <th class="p-4">วันเวลา</th>
+                                <th class="p-4">หมวดหมู่</th>
+                                <th class="p-4 text-right">จำนวน</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-rows" class="text-sm">
+                            <!-- Rows load here -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <!-- Settings Page -->
+        <!-- Settings -->
         <div id="page-settings" class="page hidden space-y-6">
-            <h2 class="text-2xl font-black tracking-tight">System Settings</h2>
-            <div class="bg-white p-7 rounded-[2.5rem] border border-gray-100 shadow-sm space-y-8">
-                <div class="flex items-center justify-between p-2">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center">
-                            <i data-lucide="shield-check"></i>
+            <h2 class="text-2xl font-bold">ตั้งค่าระบบ ⚙️</h2>
+            <div class="bg-white p-6 rounded-[2rem] shadow-sm space-y-6 border">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-green-100 text-green-600 rounded-xl flex items-center justify-center">
+                            <i data-lucide="zap" class="w-5 h-5"></i>
                         </div>
                         <div>
-                            <p class="font-black text-sm text-gray-800">โหมดประหยัดอัตโนมัติ</p>
-                            <p class="text-[10px] text-gray-400 font-bold uppercase">System Managed</p>
+                            <p class="font-bold text-sm">โหมดประหยัด (Smart)</p>
+                            <p class="text-[10px] text-gray-400">ปรับปรุงการแสดงผลให้ลื่นไหล</p>
                         </div>
                     </div>
-                    <div class="w-12 h-6 bg-green-500 rounded-full flex items-center px-1">
-                        <div class="w-4 h-4 bg-white rounded-full ml-auto shadow-sm"></div>
+                    <div class="w-12 h-6 bg-blue-600 rounded-full flex items-center px-1">
+                        <div class="w-4 h-4 bg-white rounded-full ml-auto"></div>
                     </div>
                 </div>
-                
-                <div class="space-y-4">
-                    <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.2em]">Software Version Information</p>
-                    <div class="bg-gray-50 p-6 rounded-3xl border border-gray-100">
-                        <p class="font-black text-blue-600 text-lg">IOTNovasave V.3.8.0 Stable</p>
-                        <div class="mt-4 space-y-3">
-                            <div class="text-[11px] font-bold text-gray-500 flex items-center gap-3">
-                                <i data-lucide="check-circle-2" class="w-4 h-4 text-green-500"></i> Cloud Sync Engine 5.0 (No NaN)
-                            </div>
-                            <div class="text-[11px] font-bold text-gray-500 flex items-center gap-3">
-                                <i data-lucide="check-circle-2" class="w-4 h-4 text-green-500"></i> Modern UI Icons (Lucide)
-                            </div>
-                            <div class="text-[11px] font-bold text-gray-500 flex items-center gap-3">
-                                <i data-lucide="check-circle-2" class="w-4 h-4 text-green-500"></i> AI-X11 Smart Assistant Pro
-                            </div>
-                        </div>
+                <div class="pt-4 border-t space-y-4">
+                    <div class="p-4 bg-gray-50 rounded-2xl">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-2">เวอร์ชันระบบ</p>
+                        <p class="font-bold text-sm">IOTNovasave Stable V.4.2.0</p>
+                        <ul class="mt-2 text-[11px] text-gray-500 space-y-1">
+                            <li>• แก้ไขไอคอนเมนูบาร์ให้แสดงครบทุกปุ่ม</li>
+                            <li>• ระบบ AI-X11 วิเคราะห์ข้อมูลอัจฉริยะ</li>
+                            <li>• แยกส่วน Cloud Pocket 7.0 สมบูรณ์</li>
+                            <li>• ปรับปรุงระบบ JSONP ไม่ค้างหน้าจอ</li>
+                        </ul>
                     </div>
+                    <button onclick="factoryReset()" class="w-full py-4 text-red-500 font-bold text-sm bg-red-50 rounded-2xl border border-red-100 hover:bg-red-600 hover:text-white transition">
+                        <i data-lucide="trash-2" class="inline w-4 h-4 mr-1"></i> ล้างข้อมูลและเริ่มใหม่ทั้งหมด
+                    </button>
                 </div>
-
-                <button onclick="factoryReset()" class="w-full bg-red-50 text-red-600 p-6 rounded-[2rem] font-black border border-red-100 hover:bg-red-600 hover:text-white transition-all flex items-center justify-center gap-3">
-                    <i data-lucide="trash-2"></i> ล้างข้อมูลและเริ่มใหม่ทั้งหมด
-                </button>
             </div>
         </div>
     </main>
 
-    <!-- Bottom Nav -->
-    <nav class="fixed bottom-0 w-full glass border-t border-gray-100 px-2 py-3 flex justify-around items-center z-50">
-        <button onclick="navigate('dashboard')" id="nav-dashboard" class="nav-btn">
-            <i data-lucide="home"></i>
-            <span class="text-[9px] font-black uppercase">Home</span>
-        </button>
-        <button onclick="navigate('add')" id="nav-add" class="nav-btn">
-            <i data-lucide="plus-circle"></i>
-            <span class="text-[9px] font-black uppercase">Save</span>
-        </button>
-        <button onclick="navigate('pockets')" id="nav-pockets" class="nav-btn">
-            <i data-lucide="pocket"></i>
-            <span class="text-[9px] font-black uppercase">Pockets</span>
-        </button>
-        <button onclick="navigate('history')" id="nav-history" class="nav-btn">
-            <i data-lucide="history"></i>
-            <span class="text-[9px] font-black uppercase">Log</span>
-        </button>
-        <button onclick="navigate('settings')" id="nav-settings" class="nav-btn">
-            <i data-lucide="settings-2"></i>
-            <span class="text-[9px] font-black uppercase">Settings</span>
-        </button>
-    </nav>
+    <!-- AI Floating Chat -->
+    <div id="ai-chat-bubble" onclick="toggleChat()" class="fixed bottom-24 right-5 w-14 h-14 bg-indigo-600 text-white rounded-2xl shadow-2xl flex items-center justify-center z-40 animate-bounce cursor-pointer">
+        <i data-lucide="bot"></i>
+    </div>
 
-    <!-- Floating AI -->
-    <button onclick="toggleChat()" class="fixed bottom-24 right-6 w-16 h-16 bg-indigo-600 text-white rounded-3xl shadow-2xl shadow-indigo-200 flex items-center justify-center z-40 active:scale-90 transition group overflow-hidden">
-        <i data-lucide="cpu" class="w-7 h-7 relative z-10"></i>
-        <div class="absolute inset-0 bg-white/10 scale-0 group-hover:scale-100 transition-transform duration-500 rounded-full"></div>
-    </button>
-
-    <!-- AI Modal -->
-    <div id="ai-chat" class="fixed inset-0 bg-black/40 z-[70] hidden items-end sm:items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-md rounded-t-[3rem] sm:rounded-[3rem] h-[85vh] flex flex-col shadow-2xl overflow-hidden border border-gray-100">
-            <div class="p-8 bg-indigo-600 text-white flex justify-between items-center relative overflow-hidden">
-                <div class="flex items-center gap-4 relative z-10">
-                    <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center shadow-inner">
-                        <i data-lucide="bot"></i>
-                    </div>
+    <!-- AI Chat Window -->
+    <div id="ai-modal" class="fixed inset-0 bg-black/40 z-[200] flex items-end sm:items-center justify-center hidden p-4">
+        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] h-[75vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-5 bg-indigo-600 text-white flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="cpu" class="w-6 h-6"></i>
                     <div>
-                        <p class="font-black text-lg tracking-tight">AI-X11 Assistant</p>
-                        <p class="text-[10px] text-indigo-100 font-bold uppercase tracking-widest">Smart Saving Analysis</p>
+                        <p class="font-bold">AI-X11 Assistant</p>
+                        <p class="text-[10px] opacity-70">พร้อมให้คำปรึกษา 24 ชม.</p>
                     </div>
                 </div>
-                <button onclick="toggleChat()" class="p-2 bg-white/10 rounded-full relative z-10"><i data-lucide="x"></i></button>
-                <i data-lucide="zap" class="absolute -right-6 -bottom-6 w-32 h-32 text-white/10 rotate-12"></i>
+                <button onclick="toggleChat()"><i data-lucide="x"></i></button>
             </div>
-            
-            <div id="chat-box" class="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50/50">
-                <div class="bg-white p-5 rounded-3xl rounded-tl-none shadow-sm border border-gray-100 max-w-[90%] text-sm leading-relaxed">
-                    สวัสดีครับ ผม <b>AI-X11</b> พร้อมช่วยวิเคราะห์ข้อมูลออมของคุณจากคลาวด์ เลือกหัวข้อที่ต้องการทราบได้เลยครับ
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="askAI('ตรวจสอบยอดเงินและยศ')" class="p-4 bg-white border border-gray-100 rounded-2xl hover:bg-indigo-50 transition flex flex-col items-center gap-2 shadow-sm">
-                        <i data-lucide="banknote" class="text-indigo-600"></i> <span class="text-[10px] font-black uppercase">ยอดเงิน & ยศ</span>
-                    </button>
-                    <button onclick="askAI('วิเคราะห์เลเวลและ XP')" class="p-4 bg-white border border-gray-100 rounded-2xl hover:bg-indigo-50 transition flex flex-col items-center gap-2 shadow-sm">
-                        <i data-lucide="bar-chart-2" class="text-indigo-600"></i> <span class="text-[10px] font-black uppercase">เลเวล & XP</span>
-                    </button>
-                    <button onclick="askAI('สถานะ Pocket ทั้งหมด')" class="p-4 bg-white border border-gray-100 rounded-2xl hover:bg-indigo-50 transition flex flex-col items-center gap-2 shadow-sm">
-                        <i data-lucide="pocket" class="text-indigo-600"></i> <span class="text-[10px] font-black uppercase">สถานะ Pockets</span>
-                    </button>
-                    <button onclick="askAI('คู่มือการใช้งานระบบ')" class="p-4 bg-white border border-gray-100 rounded-2xl hover:bg-indigo-50 transition flex flex-col items-center gap-2 shadow-sm">
-                        <i data-lucide="help-circle" class="text-indigo-600"></i> <span class="text-[10px] font-black uppercase">คู่มือใช้งาน</span>
-                    </button>
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-5 space-y-4 bg-gray-50">
+                <div class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm text-sm border">
+                    สวัสดีครับ! ผม AI-X11 วิเคราะห์ข้อมูลการออมของคุณแบบเรียลไทม์ สอบถามเรื่อง ยอดเงิน/เลเวล/ยศ/Pocket ได้เลยครับ
                 </div>
             </div>
-            
-            <div class="p-6 border-t bg-white flex gap-3">
-                <input type="text" id="chat-msg" placeholder="สอบถามเพิ่มเติม..." class="flex-1 bg-gray-50 p-5 rounded-2xl border-none outline-none text-sm font-bold focus:ring-4 focus:ring-indigo-50 transition-all">
-                <button onclick="sendManualChat()" class="bg-indigo-600 text-white w-14 h-14 rounded-2xl flex items-center justify-center active:scale-90 shadow-xl shadow-indigo-100 transition-all">
-                    <i data-lucide="send-horizonal" class="w-6 h-6"></i>
-                </button>
+            <div class="p-4 border-t bg-white space-y-2">
+                <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+                    <button onclick="askAI('สรุปยอดเงินปัจจุบัน')" class="whitespace-nowrap px-4 py-2 bg-blue-50 text-blue-600 text-xs rounded-full border border-blue-100">💰 สรุปยอดเงิน</button>
+                    <button onclick="askAI('ตรวจสอบเลเวลและยศ')" class="whitespace-nowrap px-4 py-2 bg-purple-50 text-purple-600 text-xs rounded-full border border-purple-100">🆙 เลเวล&ยศ</button>
+                    <button onclick="askAI('วิเคราะห์ Pocket')" class="whitespace-nowrap px-4 py-2 bg-indigo-50 text-indigo-600 text-xs rounded-full border border-indigo-100">🛍️ วิเคราะห์ Pocket</button>
+                    <button onclick="askAI('คู่มือการใช้งาน')" class="whitespace-nowrap px-4 py-2 bg-gray-50 text-gray-600 text-xs rounded-full border border-gray-100">📖 คู่มือ</button>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="chat-input" placeholder="พิมพ์คำถามของคุณ..." class="flex-1 p-4 bg-gray-100 rounded-2xl border-none text-sm focus:ring-2 focus:ring-indigo-600">
+                    <button onclick="sendChat()" class="p-4 bg-indigo-600 text-white rounded-2xl"><i data-lucide="send" class="w-5 h-5"></i></button>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Bottom Nav -->
+    <nav class="fixed bottom-0 w-full glass border-t p-2 px-4 flex justify-between items-center z-50">
+        <button onclick="navigate('dashboard')" id="nav-dashboard" class="nav-btn flex flex-col items-center gap-1 p-2 text-gray-400">
+            <i data-lucide="home" class="w-5 h-5"></i>
+            <span class="text-[9px] font-bold">หน้าหลัก</span>
+        </button>
+        <button onclick="navigate('add')" id="nav-add" class="nav-btn flex flex-col items-center gap-1 p-2 text-gray-400">
+            <i data-lucide="plus-square" class="w-5 h-5"></i>
+            <span class="text-[9px] font-bold">เพิ่มออม</span>
+        </button>
+        <button onclick="navigate('pockets')" id="nav-pockets" class="nav-btn flex flex-col items-center gap-1 p-2 text-gray-400">
+            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+            <span class="text-[9px] font-bold">Pockets</span>
+        </button>
+        <button onclick="navigate('history')" id="nav-history" class="nav-btn flex flex-col items-center gap-1 p-2 text-gray-400">
+            <i data-lucide="list-checks" class="w-5 h-5"></i>
+            <span class="text-[9px] font-bold">ประวัติ</span>
+        </button>
+        <button onclick="navigate('settings')" id="nav-settings" class="nav-btn flex flex-col items-center gap-1 p-2 text-gray-400">
+            <i data-lucide="user-cog" class="w-5 h-5"></i>
+            <span class="text-[9px] font-bold">ตั้งค่า</span>
+        </button>
+    </nav>
+
     <script>
-        const CLOUD_URL = "https://script.google.com/macros/s/AKfycbwiqHs1JnZugJWLVrDs43ia9S2bR6EZx69qIkUloAhXq0MDflP911qAsnMcIewRZgvZTQ/exec";
+        // --- System Core ---
+        const ENDPOINT = "https://script.google.com/macros/s/AKfycbwiqHs1JnZugJWLVrDs43ia9S2bR6EZx69qIkUloAhXq0MDflP911qAsnMcIewRZgvZTQ/exec";
         
         let state = {
             totalSavings: 0,
-            level: 1,
             xp: 0,
-            goals: [],
+            level: 1,
             history: [],
-            completedGoals: 0,
-            lastEditTotalDate: null,
-            goalEditCounter: 0,
-            lastGoalEditDate: null
+            pockets: [],
+            lastEditDate: null,
+            pocketEdits: {}, // { id: { count, date } }
         };
-
-        let myChart = null;
 
         window.onload = () => {
             lucide.createIcons();
-            loadFromStorage();
-            updateTime();
-            setInterval(updateTime, 1000);
+            loadLocalState();
+            syncWithCloud();
+            updateClock();
+            setInterval(updateClock, 1000);
             
             setTimeout(() => {
                 const loader = document.getElementById('loader');
                 loader.style.opacity = '0';
                 setTimeout(() => loader.style.display = 'none', 500);
                 navigate('dashboard');
+                initChart();
             }, 3000);
-
-            initChart();
         };
 
-        function updateTime() {
+        function updateClock() {
             const now = new Date();
             document.getElementById('current-time').innerText = now.toLocaleString('th-TH');
         }
 
-        function navigate(id) {
+        function loadLocalState() {
+            const saved = localStorage.getItem('IOTNovasave_V2_Records');
+            if (saved) state = JSON.parse(saved);
+        }
+
+        function saveLocalState() {
+            localStorage.setItem('IOTNovasave_V2_Records', JSON.stringify(state));
+            updateUI();
+        }
+
+        function syncWithCloud() {
+            // ดึงข้อมูลจริงจาก Cloud (จำลองผ่าน JSONP)
+            const callback = 'cb_' + Date.now();
+            window[callback] = (res) => {
+                if(res.status === 'success' && res.data) {
+                    // รวมข้อมูลหากมี (ในเคสจริง App Script ต้องส่งข้อมูลกลับมา)
+                    console.log("Cloud synced");
+                }
+                delete window[callback];
+            };
+            const s = document.createElement('script');
+            s.src = `${ENDPOINT}?action=fetch&callback=${callback}`;
+            document.body.appendChild(s);
+        }
+
+        // --- Navigation ---
+        function navigate(pageId) {
             const loader = document.getElementById('loader');
             loader.style.display = 'flex';
             loader.style.opacity = '1';
 
             setTimeout(() => {
                 document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-                document.getElementById(`page-${id}`).classList.remove('hidden');
+                document.getElementById(`page-${pageId}`).classList.remove('hidden');
                 
-                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-                const nav = document.getElementById(`nav-${id}`);
-                if(nav) nav.classList.add('active');
-
+                document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active', 'text-blue-600'));
+                document.getElementById(`nav-${pageId}`).classList.add('active', 'text-blue-600');
+                
                 loader.style.opacity = '0';
                 setTimeout(() => loader.style.display = 'none', 300);
-                
-                if(id === 'dashboard') {
-                    autoAnalyze();
-                    updateChart();
-                }
                 toggleSidebar(false);
-            }, 1000);
+                if(pageId === 'dashboard') runAIAnalysis();
+            }, 500);
         }
 
-        function toggleSidebar(open) {
+        function toggleSidebar(force) {
             const sb = document.getElementById('sidebar');
-            open ? sb.classList.add('open') : sb.classList.remove('open');
+            if(force !== undefined) force ? sb.classList.add('open') : sb.classList.remove('open');
+            else sb.classList.toggle('open');
         }
 
-        function loadFromStorage() {
-            const saved = localStorage.getItem('IOTNovasave_V2_Records');
-            if(saved) {
-                const p = JSON.parse(saved);
-                state = {
-                    ...state, 
-                    ...p,
-                    totalSavings: Number(p.totalSavings) || 0,
-                    xp: Number(p.xp) || 0,
-                    level: Number(p.level) || 1,
-                    completedGoals: Number(p.completedGoals) || 0
-                };
-            }
-            updateUI();
+        // --- Business Logic ---
+        function selectCat(cat, btn) {
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('border-blue-500', 'bg-blue-50'));
+            btn.classList.add('border-blue-500', 'bg-blue-50');
+            document.getElementById('selected-cat').value = cat;
         }
 
-        function saveToStorage() {
-            localStorage.setItem('IOTNovasave_V2_Records', JSON.stringify(state));
-            updateUI();
-        }
+        function saveToCloud() {
+            const amount = parseFloat(document.getElementById('save-amount').value);
+            const cat = document.getElementById('selected-cat').value;
 
-        function updateUI() {
-            document.getElementById('ui-total-savings').innerText = `฿${state.totalSavings.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-            document.getElementById('ui-level').innerText = state.level;
-            document.getElementById('ui-completed-goals').innerText = state.completedGoals;
-            
-            const xpNext = state.level * 1000;
-            const progress = (state.xp / xpNext) * 100;
-            document.getElementById('ui-level-bar').style.width = `${Math.min(progress, 100)}%`;
-            document.getElementById('ui-xp-current').innerText = `${Math.floor(state.xp).toLocaleString()} XP`;
-            document.getElementById('ui-xp-next').innerText = `${xpNext.toLocaleString()} XP`;
-
-            updateRank();
-            renderGoals();
-            renderHistory();
-        }
-
-        function updateRank() {
-            const badge = document.getElementById('rank-display');
-            const text = document.getElementById('ui-rank-text');
-            let cls = 'rank-bronze', txt = 'BRONZE';
-            const lv = state.level;
-
-            if(lv >= 30) { cls = 'rank-regen'; txt = 'REGEN'; }
-            else if(lv >= 15) { cls = 'rank-gold'; txt = 'GOLD'; }
-            else if(lv >= 5) { cls = 'rank-silver'; txt = 'SILVER'; }
-            
-            badge.className = `rank-badge ${cls}`;
-            badge.innerText = txt;
-            text.innerText = txt;
-            text.className = `font-black text-[10px] tracking-widest ${cls === 'rank-regen' ? 'text-purple-600' : 'text-blue-600'}`;
-        }
-
-        function submitSaving() {
-            const amt = parseFloat(document.getElementById('input-amount').value);
-            const cat = document.getElementById('input-category').value;
-
-            if(!amt || amt <= 0) return Swal.fire('ข้อมูลไม่ถูกต้อง', 'กรุณาระบุจำนวนเงินออม', 'error');
+            if(!amount || amount <= 0) return Swal.fire('ผิดพลาด', 'กรุณาระบุจำนวนเงิน', 'error');
 
             Swal.fire({
-                title: 'Syncing to Cloud...',
-                text: 'กรุณารอสักครู่ขณะระบบบันทึกข้อมูล',
+                title: 'กำลังเชื่อมต่อ Cloud...',
+                html: 'กรุณารอสักครู่ ระบบกำลังบันทึกข้อมูล',
                 allowOutsideClick: false,
                 didOpen: () => Swal.showLoading()
             });
 
             const callback = 'cb_' + Date.now();
             window[callback] = (res) => {
-                delete window[callback];
+                Swal.close();
                 if(res.status === 'success') {
-                    state.totalSavings += amt;
-                    state.xp += Math.floor(amt * 0.8);
+                    state.totalSavings += amount;
+                    state.xp += (amount * 0.5);
                     state.history.unshift({
                         id: Date.now(),
                         date: new Date().toLocaleString('th-TH'),
-                        amount: amt,
-                        category: cat,
-                        type: 'ออมเงินผ่านระบบ'
+                        amount,
+                        category: cat
                     });
                     checkLevel();
-                    saveToStorage();
-                    Swal.fire('Cloud Sync สำเร็จ!', 'ข้อมูลถูกบันทึกลง Google Sheets แล้ว', 'success');
-                    document.getElementById('input-amount').value = '';
+                    saveLocalState();
+                    Swal.fire('สำเร็จ!', 'บันทึกข้อมูลเรียบร้อยแล้ว', 'success');
+                    document.getElementById('save-amount').value = '';
                     navigate('dashboard');
                 }
+                delete window[callback];
             };
 
             const s = document.createElement('script');
-            s.src = `${CLOUD_URL}?action=save&data=${encodeURIComponent(JSON.stringify({amount: amt, category: cat, timestamp: new Date().toISOString()}))}&callback=${callback}`;
+            s.src = `${ENDPOINT}?action=save&data=${encodeURIComponent(JSON.stringify({amount, cat}))}&callback=${callback}`;
             document.body.appendChild(s);
         }
 
-        function checkLevel() {
-            const next = state.level * 1000;
-            if(state.xp >= next) {
-                state.level++;
-                state.xp -= next;
-                Swal.fire('LEVEL UP!', `คุณเลื่อนเป็นระดับ ${state.level} ยินดีด้วยครับ!`, 'success');
-            }
-        }
-
-        function editTotalSavings() {
+        function editManualSavings() {
             const today = new Date().toDateString();
-            if(state.lastEditTotalDate === today) return Swal.fire('จำกัดสิทธิ์', 'แก้ไขเงินออมสุทธิได้วันละ 1 ครั้งเท่านั้น', 'warning');
+            if(state.lastEditDate === today) return Swal.fire('จำกัดสิทธิ์', 'คุณแก้ไขยอดเงินออมได้เพียง 1 ครั้งต่อวัน', 'warning');
 
             Swal.fire({
-                title: 'แก้ไขเงินออมสุทธิ',
+                title: 'แก้ไขยอดเงินออมสุทธิ',
                 input: 'number',
-                inputLabel: 'ระบุยอดเงินที่ต้องการ (฿)',
+                inputLabel: 'ระบุยอดเงินที่ต้องการแก้ไขเป็นค่าเริ่มต้น',
                 showCancelButton: true
             }).then(res => {
                 if(res.isConfirmed && res.value) {
                     state.totalSavings = parseFloat(res.value);
-                    state.lastEditTotalDate = today;
-                    saveToStorage();
-                    Swal.fire('สำเร็จ', 'แก้ไขยอดเงินออมแล้ว', 'success');
+                    state.lastEditDate = today;
+                    saveLocalState();
+                    Swal.fire('เรียบร้อย', 'ปรับปรุงยอดเงินสำเร็จ', 'success');
                 }
             });
         }
 
-        function renderGoals() {
-            const list = document.getElementById('ui-goals-list');
-            if(!list) return;
-            if(state.goals.length === 0) {
-                list.innerHTML = `<div class="text-center py-12 text-gray-300 font-bold text-xs uppercase tracking-widest">No Cloud Pockets Found</div>`;
-                return;
+        function checkLevel() {
+            const nextXp = state.level * 1000;
+            if(state.xp >= nextXp) {
+                state.level++;
+                state.xp = 0;
+                Swal.fire('Level Up!', `คุณเลื่อนระดับเป็น Level ${state.level}`, 'success');
             }
-            list.innerHTML = state.goals.map(g => {
-                const perc = Math.min(((g.current || 0) / (g.target || 1)) * 100, 100);
+        }
+
+        // --- Cloud Pocket 7.0 ---
+        async function addPocketModal() {
+            const { value: formValues } = await Swal.fire({
+                title: 'กระเป๋าเป้าหมายใหม่',
+                html:
+                    '<input id="p-name" class="swal2-input" placeholder="ชื่อเป้าหมาย">' +
+                    '<input id="p-target" type="number" class="swal2-input" placeholder="ยอดเงินเป้าหมาย">',
+                focusConfirm: false,
+                preConfirm: () => [
+                    document.getElementById('p-name').value,
+                    document.getElementById('p-target').value
+                ]
+            });
+
+            if (formValues && formValues[0] && formValues[1]) {
+                state.pockets.push({
+                    id: Date.now(),
+                    name: formValues[0],
+                    target: parseFloat(formValues[1]),
+                    current: 0,
+                    completed: false
+                });
+                saveLocalState();
+            }
+        }
+
+        function updatePocket(id) {
+            const today = new Date().toDateString();
+            if(!state.pocketEdits[id]) state.pocketEdits[id] = { count: 0, date: today };
+            
+            if(state.pocketEdits[id].date !== today) {
+                state.pocketEdits[id] = { count: 0, date: today };
+            }
+
+            if(state.pocketEdits[id].count >= 2) return Swal.fire('จำกัดสิทธิ์', 'แก้ไขเป้าหมายนี้ครบ 2 ครั้งของวันนี้แล้ว', 'warning');
+
+            Swal.fire({
+                title: 'เติมเงินเข้า Pocket',
+                input: 'number',
+                inputPlaceholder: 'จำนวนเงิน'
+            }).then(res => {
+                if(res.isConfirmed && res.value) {
+                    const p = state.pockets.find(x => x.id === id);
+                    p.current += parseFloat(res.value);
+                    state.pocketEdits[id].count++;
+                    if(p.current >= p.target) {
+                        p.completed = true;
+                        Swal.fire('เป้าหมายสำเร็จ!', `ยินดีด้วย! คุณออม ${p.name} ครบแล้ว`, 'success');
+                    }
+                    saveLocalState();
+                }
+            });
+        }
+
+        function deletePocket(id) {
+            const p = state.pockets.find(x => x.id === id);
+            if(!p.completed) return Swal.fire('ไม่อนุญาต', 'ลบได้เฉพาะเป้าหมายที่สำเร็จแล้วเท่านั้น', 'error');
+            
+            Swal.fire({
+                title: 'ลบเป้าหมาย?',
+                text: 'รายการที่สำเร็จแล้วจะหายไปจาก Cloud',
+                icon: 'warning',
+                showCancelButton: true
+            }).then(res => {
+                if(res.isConfirmed) {
+                    state.pockets = state.pockets.filter(x => x.id !== id);
+                    saveLocalState();
+                }
+            });
+        }
+
+        // --- UI Updates ---
+        function updateUI() {
+            document.getElementById('total-savings').innerText = `฿${state.totalSavings.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById('user-level').innerText = state.level;
+            document.getElementById('goal-count').innerText = state.pockets.filter(p => !p.completed).length;
+            
+            const nextXp = state.level * 1000;
+            const xpPer = Math.min((state.xp / nextXp) * 100, 100);
+            document.getElementById('xp-bar').style.width = `${xpPer}%`;
+            document.getElementById('xp-text').innerText = `${xpPer.toFixed(1)}%`;
+
+            const badge = document.getElementById('rank-badge');
+            if(state.level < 5) { badge.innerText = 'Bronze'; badge.className = 'rank-badge rank-bronze'; }
+            else if(state.level < 15) { badge.innerText = 'Silver'; badge.className = 'rank-badge rank-silver'; }
+            else if(state.level < 30) { badge.innerText = 'Gold'; badge.className = 'rank-badge rank-gold'; }
+            else { badge.innerText = 'Regen'; badge.className = 'rank-badge rank-regen'; }
+
+            // History
+            const rows = document.getElementById('history-rows');
+            rows.innerHTML = state.history.map(h => `
+                <tr class="border-b last:border-0 hover:bg-gray-50 transition">
+                    <td class="p-4 text-[10px] text-gray-500">${h.date.split(',')[0]}<br>${h.date.split(',')[1]}</td>
+                    <td class="p-4 font-bold text-gray-700">${h.category}</td>
+                    <td class="p-4 text-right font-bold text-blue-600">฿${h.amount.toLocaleString()}</td>
+                </tr>
+            `).join('') || '<tr><td colspan="3" class="p-10 text-center text-gray-400">ยังไม่มีประวัติการออม</td></tr>';
+
+            // Pockets
+            const pList = document.getElementById('pocket-list');
+            pList.innerHTML = state.pockets.map(p => {
+                const per = Math.min((p.current / p.target) * 100, 100);
                 return `
-                    <div class="pocket-card space-y-4">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h4 class="font-black text-gray-800 text-lg">${g.name}</h4>
-                                <p class="text-[9px] text-blue-400 font-black tracking-widest uppercase">ID: ${g.id}</p>
-                            </div>
-                            <div class="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-[10px] font-black">${perc.toFixed(1)}%</div>
+                    <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-gray-100 relative overflow-hidden">
+                        ${p.completed ? '<div class="absolute top-2 right-4 text-[10px] font-bold text-green-500 uppercase">สำเร็จแล้ว</div>' : ''}
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="font-bold text-gray-700">${p.name}</span>
+                            <span class="text-xs font-bold ${p.completed ? 'text-green-500' : 'text-blue-600'}">${per.toFixed(1)}%</span>
                         </div>
-                        <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden shadow-inner">
-                            <div class="h-full bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-700" style="width: ${perc}%"></div>
+                        <div class="w-full bg-gray-100 h-2 rounded-full mb-4 overflow-hidden">
+                            <div class="h-full ${p.completed ? 'bg-green-500' : 'bg-blue-600'} transition-all duration-1000" style="width: ${per}%"></div>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span class="text-xs font-black text-gray-400">฿${(g.current || 0).toLocaleString()} / ฿${(g.target || 0).toLocaleString()}</span>
+                            <span class="text-[11px] font-bold text-gray-400">฿${p.current.toLocaleString()} / ฿${p.target.toLocaleString()}</span>
                             <div class="flex gap-2">
-                                <button onclick="addToGoal(${g.id})" class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center active:scale-90 transition shadow-lg shadow-blue-100"><i data-lucide="plus" class="w-4 h-4"></i></button>
-                                <button onclick="deleteGoal(${g.id})" class="w-10 h-10 bg-red-50 text-red-500 rounded-xl flex items-center justify-center active:scale-90 transition border border-red-100"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                ${!p.completed ? `<button onclick="updatePocket(${p.id})" class="p-2 bg-blue-50 text-blue-600 rounded-xl"><i data-lucide="plus" class="w-4 h-4"></i></button>` : ''}
+                                <button onclick="deletePocket(${p.id})" class="p-2 bg-red-50 text-red-500 rounded-xl ${!p.completed ? 'opacity-30 cursor-not-allowed' : ''}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </div>
                         </div>
                     </div>
                 `;
-            }).join('');
+            }).join('') || '<div class="text-center py-10 text-gray-400 italic">ยังไม่มีเป้าหมายใน Cloud</div>';
+            
             lucide.createIcons();
+            updateChart();
         }
 
-        async function openNewGoalModal() {
-            const { value: v } = await Swal.fire({
-                title: 'New Cloud Pocket',
-                html: `<input id="swal-n" class="swal2-input" placeholder="ชื่อเป้าหมาย"><input id="swal-t" type="number" class="swal2-input" placeholder="ยอดเงินเป้าหมาย">`,
-                preConfirm: () => [document.getElementById('swal-n').value, document.getElementById('swal-t').value]
-            });
-            if (v && v[0] && v[1]) {
-                state.goals.push({ id: Date.now(), name: v[0], target: parseFloat(v[1]), current: 0 });
-                saveToStorage();
-            }
-        }
-
-        async function addToGoal(id) {
-            const today = new Date().toDateString();
-            if(state.lastGoalEditDate !== today) { state.goalEditCounter = 0; state.lastGoalEditDate = today; }
-            if(state.goalEditCounter >= 2) return Swal.fire('จำกัดสิทธิ์', 'คุณแก้ไข Pocket ได้ 2 ครั้งต่อวัน', 'warning');
-
-            const { value: amt } = await Swal.fire({ title: 'Add to Pocket', input: 'number', inputPlaceholder: 'ระบุยอดเงินออมเพิ่ม' });
-            if(amt && !isNaN(amt)) {
-                const g = state.goals.find(x => x.id === id);
-                g.current += parseFloat(amt);
-                state.goalEditCounter++;
-                if(g.current >= g.target) {
-                    state.completedGoals++;
-                    state.history.unshift({ id: Date.now(), date: new Date().toLocaleString('th-TH'), amount: g.target, category: 'Pocket Success', type: 'สำเร็จ: ' + g.name });
-                    state.goals = state.goals.filter(x => x.id !== id);
-                    Swal.fire('POCKET COMPLETED!', 'เป้าหมายสำเร็จแล้ว!', 'success');
-                }
-                saveToStorage();
-            }
-        }
-
-        function deleteGoal(id) {
-            Swal.fire({ title: 'ลบรายการ?', text: "ข้อมูลนี้จะถูกลบออกจาก Pocket ทันที", icon: 'warning', showCancelButton: true }).then(r => {
-                if(r.isConfirmed) { state.goals = state.goals.filter(x => x.id !== id); saveToStorage(); }
-            });
-        }
-
-        function renderHistory() {
-            const list = document.getElementById('ui-history-list');
-            if(!list) return;
-            if(state.history.length === 0) {
-                list.innerHTML = `<p class="text-center py-10 text-gray-300 font-bold text-xs uppercase">No Activity Log</p>`;
-                return;
-            }
-            list.innerHTML = state.history.map(h => `
-                <div class="bg-white p-5 rounded-[1.5rem] flex justify-between items-center border border-gray-50 shadow-sm transition hover:bg-gray-50">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 ${h.category === 'Pocket Success' ? 'bg-green-100 text-green-600' : 'bg-blue-50 text-blue-600'} rounded-2xl flex items-center justify-center">
-                            <i data-lucide="${h.category === 'Pocket Success' ? 'trophy' : 'check-circle'}" class="w-6 h-6"></i>
-                        </div>
-                        <div>
-                            <p class="font-black text-xs text-gray-800">${h.type || h.category}</p>
-                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">${h.date}</p>
-                        </div>
-                    </div>
-                    <p class="font-black text-blue-600">฿${h.amount.toLocaleString()}</p>
-                </div>
-            `).join('');
-            lucide.createIcons();
-        }
-
-        function autoAnalyze() {
-            const el = document.getElementById('ui-ai-insight');
-            if(!el) return;
+        // --- AI Analysis ---
+        function runAIAnalysis() {
+            const insight = document.getElementById('ai-insight');
+            insight.innerHTML = '<span class="animate-pulse">AI-X11 กำลังวิเคราะห์ข้อมูลจริงของคุณ...</span>';
+            
             setTimeout(() => {
                 const total = state.totalSavings;
                 const count = state.history.length;
-                if(count === 0) el.innerText = `"เริ่มต้นออมเงินวันนี้เพื่อปลดล็อกฟีเจอร์ AI วิเคราะห์ระดับสูงและยศใหม่ของคุณครับ"`;
-                else {
-                    const avg = total / count;
-                    el.innerText = `"วิเคราะห์: คุณออมเฉลี่ย ฿${avg.toFixed(2)} ต่อครั้ง สถานะการเงินของคุณ ${state.level > 5 ? 'ยอดเยี่ยมมาก' : 'กำลังเริ่มต้นได้ดี'} แนะนำออมสม่ำเสมอครับ"`;
-                }
+                let msg = "";
+                if(total === 0) msg = "เริ่มต้นบันทึกการออมก้าวแรกวันนี้ เพื่อให้ AI ช่วยวางแผนให้คุณนะครับ";
+                else if(total < 5000) msg = `วิเคราะห์พบการออมแล้ว ${count} รายการ คุณกำลังอยู่ในช่วงสร้างวินัย แนะนำให้ลองตั้งเป้าหมายใน Pocket เพิ่มดูครับ`;
+                else msg = `สุดยอดมาก! ยอดออมสุทธิ ฿${total.toLocaleString()} ของคุณอยู่ในเกณฑ์ดีเยี่ยม ระบบปรับโหมดเป็น Smart Saving ให้คุณแล้ว`;
+                insight.innerText = `"${msg}"`;
             }, 5000);
         }
 
-        function toggleChat() {
-            const modal = document.getElementById('ai-chat');
-            const isHidden = modal.classList.contains('hidden');
-            modal.classList.toggle('hidden', !isHidden);
-            modal.classList.toggle('flex', isHidden);
-            lucide.createIcons();
+        // --- AI Chat ---
+        function toggleChat() { document.getElementById('ai-modal').classList.toggle('hidden'); }
+        
+        function askAI(cmd) {
+            document.getElementById('chat-input').value = cmd;
+            sendChat();
         }
 
-        function askAI(type) {
-            const box = document.getElementById('chat-box');
-            let res = "";
-            if(type.includes('ยอดเงิน')) res = `ยอดเงินสุทธิ ฿${state.totalSavings.toLocaleString()} ยศปัจจุบัน: ${document.getElementById('rank-display').innerText}`;
-            else if(type.includes('เลเวล')) res = `Level ${state.level} (XP: ${state.xp.toLocaleString()}) ขาดอีก ฿${((state.level * 1000) - state.xp).toLocaleString()} เพื่ออัพเลเวล`;
-            else if(type.includes('Pocket')) res = state.goals.length > 0 ? `มี Pocket ${state.goals.length} รายการที่กำลังออม แนะนำออมให้ครบ 100% เพื่อรับยศสูงสุดครับ` : `ยังไม่มี Pocket ใหม่ แนะนำให้สร้างเพื่อเป้าหมายที่ชัดเจนครับ`;
-            else res = `คู่มือ: บันทึกออมที่หน้า "Save", จัดการเป้าหมายที่ "Pockets" ยิ่งออมมาก ยศยิ่งสูง (Bronze -> Regen)`;
+        function sendChat() {
+            const input = document.getElementById('chat-input');
+            const box = document.getElementById('chat-messages');
+            if(!input.value) return;
 
-            box.innerHTML += `<div class="bg-indigo-600 text-white p-5 rounded-3xl rounded-tr-none shadow-md max-w-[85%] ml-auto text-xs font-black uppercase tracking-tight">${type}</div>`;
+            const userMsg = input.value;
+            box.innerHTML += `<div class="bg-indigo-600 text-white p-4 rounded-2xl rounded-tr-none shadow-sm text-sm self-end ml-10">${userMsg}</div>`;
+            input.value = '';
+            box.scrollTop = box.scrollHeight;
+
             setTimeout(() => {
-                box.innerHTML += `<div class="bg-white p-5 rounded-3xl rounded-tl-none shadow-sm border border-gray-100 max-w-[90%] text-sm text-gray-700">${res}</div>`;
+                let reply = "ขออภัยครับ AI-X11 ไม่พบข้อมูลที่คุณสอบถาม กรุณาลองเลือกจากเมนูคำถามด่วนครับ";
+                if(userMsg.includes("ยอดเงิน")) reply = `ยอดเงินออมสุทธิของคุณตอนนี้คือ ฿${state.totalSavings.toLocaleString()} ครับ`;
+                if(userMsg.includes("เลเวล")) reply = `คุณอยู่ที่ Level ${state.level} ยศ ${document.getElementById('rank-badge').innerText} อีกนิดจะอัพเกรดแล้ว!`;
+                if(userMsg.includes("ยศมีกี่ขั้น")) reply = "ระบบยศมี 4 ขั้นครับ: Bronze (Lv.1), Silver (Lv.5), Gold (Lv.15) และ Regen (Lv.30+)";
+                if(userMsg.includes("Pocket")) reply = `ตอนนี้คุณมีเป้าหมายที่กำลังดำเนินการอยู่ ${state.pockets.filter(p=>!p.completed).length} รายการครับ`;
+                if(userMsg.includes("คู่มือ")) reply = "1. หน้าเพิ่มออม: บันทึกข้อมูลลง Cloud Sheet\n2. หน้า Pocket: แยกออมตามเป้าหมาย\n3. AI จะวิเคราะห์ข้อมูลให้ทุก 5 วินาทีเมื่อเข้าหน้าหลักครับ";
+
+                box.innerHTML += `<div class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm text-sm border mr-10">${reply}</div>`;
                 box.scrollTop = box.scrollHeight;
             }, 800);
         }
 
-        function sendManualChat() {
-            const input = document.getElementById('chat-msg');
-            if(!input.value) return;
-            const val = input.value; input.value = '';
-            const box = document.getElementById('chat-box');
-            box.innerHTML += `<div class="bg-indigo-600 text-white p-5 rounded-3xl rounded-tr-none shadow-md max-w-[85%] ml-auto text-xs font-bold">${val}</div>`;
-            setTimeout(() => {
-                box.innerHTML += `<div class="bg-white p-5 rounded-3xl rounded-tl-none shadow-sm border border-gray-100 max-w-[90%] text-sm">AI-X11 รับทราบครับ แนะนำให้ใช้ปุ่มวิเคราะห์อัตโนมัติเพื่อให้ได้ข้อมูลที่แม่นยำที่สุดจาก Cloud ของคุณ!</div>`;
-                box.scrollTop = box.scrollHeight;
-            }, 1000);
-        }
-
-        function initChart() {
-            const ctx = document.getElementById('savingsChart').getContext('2d');
-            myChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7'],
-                    datasets: [{
-                        data: [0, 0, 0, 0, 0, 0, 0],
-                        borderColor: '#2563eb',
-                        backgroundColor: 'rgba(37, 99, 235, 0.05)',
-                        fill: true, tension: 0.4, borderWidth: 3, pointRadius: 0
-                    }]
-                },
-                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { font: { size: 8, family: 'Kanit', weight: 'bold' } } } } }
-            });
-        }
-
-        function updateChart() {
-            if(!myChart) return;
-            const data = state.history.slice(0, 7).map(h => h.amount).reverse();
-            while(data.length < 7) data.unshift(0);
-            myChart.data.datasets[0].data = data;
-            myChart.update();
-        }
-
         function factoryReset() {
             Swal.fire({
-                title: 'SYSTEM FACTORY RESET',
-                text: "ข้อมูลทั้งหมดในเครื่องและ Cloud จะถูกลบถาวร ไม่สามารถกู้คืนได้!",
+                title: 'ยืนยันล้างข้อมูลทั้งหมด?',
+                text: 'ข้อมูลใน Cloud และเครื่องนี้จะถูกลบถาวร ไม่สามารถกู้คืนได้!',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                confirmButtonText: 'CONFIRM DELETE'
-            }).then(r => {
-                if(r.isConfirmed) {
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'ล้างข้อมูลเลย'
+            }).then(res => {
+                if(res.isConfirmed) {
                     localStorage.removeItem('IOTNovasave_V2_Records');
                     location.reload();
                 }
             });
+        }
+
+        // --- Chart ---
+        let chart;
+        function initChart() {
+            const ctx = document.getElementById('savingChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส', 'อา'],
+                    datasets: [{
+                        label: 'ยอดออม',
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { display: false },
+                        x: { grid: { display: false }, border: { display: false } }
+                    }
+                }
+            });
+        }
+        function updateChart() {
+            if(!chart) return;
+            // จำลองสถิติจาก history
+            const data = [0, 0, 0, 0, 0, 0, 0];
+            state.history.slice(0, 7).forEach((h, i) => { data[6-i] = h.amount; });
+            chart.data.datasets[0].data = data;
+            chart.update();
         }
     </script>
 </body>
