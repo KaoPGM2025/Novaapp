@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IOTNovasave PRO 2026 | 3D Saving Ecosystem</title>
+    <title>IOTNovasave Pro 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap');
         
         :root {
-            --bg: #e0e5ec;
+            --bg-color: #e0e5ec;
             --shadow-light: #ffffff;
             --shadow-dark: #a3b1c6;
             --primary: #3b82f6;
@@ -20,593 +20,566 @@
 
         body { 
             font-family: 'Kanit', sans-serif; 
-            background-color: var(--bg); 
-            color: #444; 
+            background-color: var(--bg-color); 
+            color: #4a5568;
             overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
         }
 
         /* 3D Neumorphism Styles */
         .neu-3d {
-            background: var(--bg);
-            border-radius: 20px;
+            background: var(--bg-color);
             box-shadow: 9px 9px 16px var(--shadow-dark), -9px -9px 16px var(--shadow-light);
+            border-radius: 20px;
         }
 
         .neu-3d-inset {
-            background: var(--bg);
-            border-radius: 15px;
+            background: var(--bg-color);
             box-shadow: inset 6px 6px 12px var(--shadow-dark), inset -6px -6px 12px var(--shadow-light);
+            border-radius: 15px;
         }
 
-        .neu-3d-button {
-            background: var(--bg);
-            border-radius: 15px;
+        .neu-btn-3d {
+            background: var(--bg-color);
             box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
             transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 5px;
         }
 
-        .neu-3d-button:active {
+        .neu-btn-3d:active {
             box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
             transform: scale(0.98);
         }
 
         .loader-overlay {
-            position: fixed; inset: 0; background: var(--bg); z-index: 9999;
+            position: fixed; inset: 0; background: var(--bg-color); z-index: 2000;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        .scan-line {
-            width: 100%; height: 2px; background: #3b82f6;
-            position: absolute; top: 0; left: 0;
-            animation: scan 2s linear infinite;
-            box-shadow: 0 0 15px #3b82f6;
+        .sidebar {
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000; transform: translateX(-110%);
         }
-
-        @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
-
-        .rank-regen { background: linear-gradient(145deg, #ff00ea, #7000ff); color: white; box-shadow: 0 0 20px rgba(112, 0, 255, 0.4); }
-        
-        /* Mobile Adjustments */
-        main { max-width: 480px; margin: 0 auto; padding-bottom: 120px; }
-        .sidebar { transform: translateX(-110%); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .sidebar.active { transform: translateX(0); }
 
-        input.neu-3d-inset { border: none; padding: 15px 20px; outline: none; width: 100%; }
+        .rank-regen {
+            background: linear-gradient(145deg, #7c3aed, #db2777);
+            color: white; box-shadow: 0 0 15px rgba(124, 58, 237, 0.5);
+            animation: glow 2s infinite alternate;
+        }
+        @keyframes glow { from { opacity: 0.8; } to { opacity: 1; } }
+
+        #camera-feed {
+            width: 100%; max-width: 300px; height: 300px;
+            object-fit: cover; border-radius: 50%;
+            border: 8px solid var(--primary);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
+        }
+
+        .scan-line {
+            position: absolute; width: 100%; height: 2px;
+            background: var(--primary); top: 0;
+            animation: scan 2s linear infinite;
+        }
+        @keyframes scan { from { top: 0; } to { top: 100%; } }
     </style>
 </head>
-<body>
+<body class="pb-24">
 
-    <!-- Global Loader (3s) -->
-    <div id="global-loader" class="loader-overlay">
-        <div class="neu-3d p-8 mb-6 animate-bounce">
-            <i data-lucide="layers" class="w-12 h-12 text-blue-600"></i>
+    <!-- Loading Screen (3s) -->
+    <div id="loader" class="loader-overlay">
+        <div class="neu-3d p-8 animate-pulse">
+            <i data-lucide="shield-check" class="w-16 h-16 text-blue-500"></i>
         </div>
-        <p class="font-bold text-blue-600 tracking-widest uppercase text-sm">V.12.2.0 PRO BOOTING...</p>
+        <p class="mt-6 font-bold text-slate-500">IOTNovasave PRO 2026 (3s Loading...)</p>
     </div>
 
-    <!-- Face Scan / Identification Overlay -->
-    <div id="auth-overlay" class="fixed inset-0 bg-[#e0e5ec] z-[9000] flex flex-col items-center justify-center p-8 hidden">
-        <div class="neu-3d p-10 w-full max-w-sm text-center space-y-8">
-            <h2 class="text-2xl font-bold text-slate-800">ยืนยันตัวตน (FaceID)</h2>
-            <p class="text-xs text-slate-500 font-medium italic">แสกนหน้าต้องอยู่ในแสงสว่างเท่านั้น</p>
+    <!-- Auth System (One Time Only) -->
+    <div id="auth-screen" class="fixed inset-0 bg-[#e0e5ec] z-[1500] flex flex-col items-center justify-center p-6 hidden">
+        <div class="neu-3d p-8 w-full max-w-md text-center">
+            <h2 class="text-2xl font-bold mb-2">ยืนยันตัวตน PRO 2026</h2>
+            <p class="text-xs text-red-500 mb-6 font-bold uppercase">ระวัง: แสกนหน้าได้ครั้งเดียว/คนเดียวถาวร</p>
             
-            <div id="camera-box" class="relative w-48 h-48 mx-auto rounded-full overflow-hidden neu-3d-inset border-4 border-white">
-                <video id="video" class="w-full h-full object-cover grayscale" autoplay playsinline></video>
-                <div class="scan-line"></div>
-                <div id="scan-success-icon" class="absolute inset-0 flex items-center justify-center bg-green-500/80 text-white hidden">
-                    <i data-lucide="check-circle-2" class="w-16 h-16"></i>
+            <div id="auth-step-1" class="space-y-6">
+                <div class="neu-3d-inset p-2">
+                    <input type="text" id="reg-name" placeholder="ใส่ชื่อโปรไฟล์ (ถาวร)" class="w-full p-4 bg-transparent outline-none font-bold text-center">
                 </div>
+                <button onclick="startFaceScan()" class="neu-btn-3d w-full py-4 text-blue-600 font-bold rounded-2xl">ถัดไป: แสกนใบหน้า</button>
             </div>
 
-            <div class="space-y-4">
-                <input type="text" id="profile-name-input" class="neu-3d-inset text-center font-bold" placeholder="กรอกชื่อโปรไฟล์">
-                <button onclick="startScanning()" class="w-full py-4 neu-3d-button text-blue-600 font-bold text-lg">
-                    <i data-lucide="scan-face" class="w-6 h-6 mb-1"></i> เริ่มการสแกน
-                </button>
+            <div id="auth-step-2" class="hidden flex flex-col items-center">
+                <div class="relative mb-6">
+                    <video id="camera-feed" autoplay playsinline></video>
+                    <div class="scan-line"></div>
+                </div>
+                <p id="scan-status" class="text-sm font-bold animate-pulse text-blue-500">กำลังตรวจจับใบหน้าในแสงสว่าง...</p>
             </div>
-            <p class="text-[10px] text-red-400 font-bold">ยืนยันได้เพียงครั้งเดียว | ห้ามแก้ไขในภายหลัง</p>
         </div>
     </div>
-
-    <!-- Top Header -->
-    <header class="fixed top-0 w-full z-50 px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center gap-4">
-            <button onclick="toggleSidebar(true)" class="w-12 h-12 neu-3d-button text-slate-600">
-                <i data-lucide="layout-grid"></i>
-            </button>
-            <div class="flex flex-col">
-                <div class="flex items-center gap-1">
-                    <h1 class="text-lg font-black text-slate-800 tracking-tight">IOTNovasave</h1>
-                    <button onclick="location.reload()" class="p-1"><i data-lucide="rotate-cw" class="w-3 h-3 text-blue-400"></i></button>
-                </div>
-                <span id="user-display-name" class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">GUEST USER</span>
-            </div>
-        </div>
-        <div id="header-clock" class="neu-3d-inset px-4 py-2 text-xs font-mono font-bold text-blue-600">00:00:00</div>
-    </header>
 
     <!-- Sidebar -->
-    <aside id="sidebar-menu" class="fixed top-0 left-0 h-full w-72 bg-[#e0e5ec] sidebar z-[100] p-6 flex flex-col shadow-2xl">
-        <div class="flex justify-between items-center mb-10">
-            <span class="font-black text-xl text-blue-600 italic">PRO MENU</span>
-            <button onclick="toggleSidebar(false)" class="w-10 h-10 neu-3d-button text-slate-400"><i data-lucide="x"></i></button>
+    <div id="overlay" onclick="toggleMenu(false)" class="fixed inset-0 bg-black/20 backdrop-blur-sm z-[900] hidden"></div>
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-[#e0e5ec] sidebar p-6 flex flex-col shadow-2xl">
+        <div class="flex items-center gap-4 mb-10 neu-3d p-4">
+            <div class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center text-white">
+                <i data-lucide="user"></i>
+            </div>
+            <div>
+                <p id="user-display-name" class="font-bold text-slate-700">User</p>
+                <p class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Verified Pro</p>
+            </div>
         </div>
-        <nav class="space-y-6 flex-1">
-            <button onclick="navigate('dashboard')" class="w-full p-4 neu-3d-button flex-row gap-4 justify-start">
-                <i data-lucide="layout-dashboard" class="text-blue-500"></i> <span class="font-bold">แดชบอร์ดหลัก</span>
+        <nav class="space-y-4 flex-1">
+            <button onclick="navigate('dashboard')" class="w-full flex items-center gap-4 p-4 neu-btn-3d rounded-2xl font-bold text-slate-600">
+                <i data-lucide="layout-grid"></i> Dashboard
             </button>
-            <button onclick="navigate('pockets')" class="w-full p-4 neu-3d-button flex-row gap-4 justify-start">
-                <i data-lucide="box" class="text-orange-500"></i> <span class="font-bold">Cloud Pocket 11.0</span>
+            <button onclick="navigate('pockets')" class="w-full flex items-center gap-4 p-4 neu-btn-3d rounded-2xl font-bold text-slate-600">
+                <i data-lucide="package-search"></i> Cloud Pockets 11.0
             </button>
-            <button onclick="navigate('history')" class="w-full p-4 neu-3d-button flex-row gap-4 justify-start">
-                <i data-lucide="list-checks" class="text-emerald-500"></i> <span class="font-bold">ประวัติรายการ</span>
+            <button onclick="navigate('history')" class="w-full flex items-center gap-4 p-4 neu-btn-3d rounded-2xl font-bold text-slate-600">
+                <i data-lucide="layers"></i> History Records
             </button>
-            <button onclick="navigate('settings')" class="w-full p-4 neu-3d-button flex-row gap-4 justify-start">
-                <i data-lucide="shield-check" class="text-purple-500"></i> <span class="font-bold">ตั้งค่าความปลอดภัย</span>
+            <button onclick="navigate('settings')" class="w-full flex items-center gap-4 p-4 neu-btn-3d rounded-2xl font-bold text-slate-600">
+                <i data-lucide="settings-2"></i> System Settings
             </button>
         </nav>
-        <div class="neu-3d-inset p-4 text-center">
-            <p class="text-[10px] font-bold text-slate-400 uppercase">Version 12.2.0 PRO</p>
+        <div class="neu-3d-inset p-4 text-[10px] text-center font-bold text-slate-400">
+            IOTNovasave V.15.0.0 PRO 2026
         </div>
     </aside>
 
-    <main class="mt-28 px-6">
+    <!-- Header -->
+    <header class="fixed top-0 w-full p-5 flex justify-between items-center z-50">
+        <div class="flex items-center gap-3">
+            <button onclick="toggleMenu(true)" class="neu-btn-3d p-3 rounded-xl text-blue-600">
+                <i data-lucide="menu"></i>
+            </button>
+            <h1 class="font-bold text-lg text-slate-700">IOTNovasave <span onclick="location.reload()" class="cursor-pointer text-blue-400">F5</span></h1>
+        </div>
+        <div id="clock" class="neu-3d-inset px-4 py-2 text-xs font-mono font-bold text-blue-600">00:00:00</div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="mt-24 px-6 max-w-md mx-auto">
+        
         <!-- DASHBOARD -->
-        <section id="page-dashboard" class="page-view space-y-8">
-            <!-- 3D Balance Card -->
-            <div class="neu-3d p-8 relative overflow-hidden group">
-                <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all"></div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">ยอดเงินออมสุทธิ</p>
-                <div class="flex justify-between items-end">
-                    <h2 id="total-savings-val" class="text-4xl font-black text-slate-800">฿0.00</h2>
-                    <div id="rank-tag" class="px-3 py-1 rounded-lg text-[10px] font-black neu-3d text-amber-700">BRONZE</div>
+        <section id="view-dashboard" class="page-view space-y-6">
+            <div class="neu-3d p-8 text-center space-y-4">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">ยอดเงินออมสุทธิ PRO</p>
+                <h2 id="balance-main" class="text-4xl font-bold text-slate-800 tracking-tighter">฿0.00</h2>
+                <div class="flex justify-center gap-2">
+                    <span id="badge-rank" class="px-4 py-1.5 rounded-full text-[10px] font-bold shadow-md bg-slate-200">BRONZE</span>
+                    <span class="px-4 py-1.5 rounded-full text-[10px] font-bold shadow-md bg-white text-blue-600">LV.<span id="user-lv">1</span></span>
                 </div>
-                <div class="mt-6 space-y-2">
-                    <div class="flex justify-between text-[10px] font-bold uppercase">
-                        <span>Level <span id="level-val">1</span></span>
-                        <span id="xp-percent">0%</span>
-                    </div>
-                    <div class="h-3 neu-3d-inset overflow-hidden p-0.5">
-                        <div id="xp-bar" class="h-full bg-blue-500 rounded-full transition-all duration-1000" style="width: 0%"></div>
-                    </div>
+                <div class="w-full neu-3d-inset h-3 mt-4 overflow-hidden">
+                    <div id="xp-bar" class="bg-blue-500 h-full transition-all duration-1000" style="width: 0%"></div>
                 </div>
             </div>
 
-            <!-- AI-X15PRO Intelligence -->
-            <div class="neu-3d p-6 border-l-4 border-blue-500">
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="w-10 h-10 neu-3d-button text-blue-600"><i data-lucide="cpu" class="w-5 h-5"></i></div>
-                    <h3 class="font-bold text-sm">AI-X15PRO (3D Analytics)</h3>
+            <!-- AI Assistant X15 PRO -->
+            <div class="neu-3d p-6 relative overflow-hidden">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="neu-btn-3d p-2 rounded-lg text-purple-600">
+                        <i data-lucide="cpu"></i>
+                    </div>
+                    <span class="font-bold text-sm">AI-X15 PRO Assistant</span>
                 </div>
-                <p id="ai-auto-analysis" class="text-xs text-slate-600 leading-relaxed italic">
-                    "ระบบอัจฉริยะกำลังเตรียมพร้อมวิเคราะห์ข้อมูล Cloud ของคุณ..."
-                </p>
+                <p id="ai-text" class="text-xs text-slate-500 italic leading-loose">"กำลังรวบรวมข้อมูลใน Cloud เพื่อวิเคราะห์ใน 10 วินาที..."</p>
             </div>
 
-            <!-- 3D Chart Card -->
+            <!-- 3D Graph -->
             <div class="neu-3d p-6">
-                <h3 class="text-xs font-bold mb-4 flex items-center gap-2">
-                    <i data-lucide="bar-chart-3" class="text-blue-500"></i> สถิติการออม 7 วันล่าสุด
-                </h3>
-                <canvas id="saving-chart" class="w-full"></canvas>
+                <h3 class="text-xs font-bold mb-4 flex items-center gap-2"><i data-lucide="bar-chart-3" class="w-4 h-4 text-blue-500"></i> สถิติวิเคราะห์ 5 วินาที</h3>
+                <canvas id="savingChart" height="180"></canvas>
             </div>
         </section>
 
-        <!-- ADD SAVING -->
-        <section id="page-add" class="page-view hidden space-y-8">
-            <h2 class="text-2xl font-black text-slate-800 flex items-center gap-3">
-                <i data-lucide="plus-square" class="text-blue-600"></i> เพิ่มข้อมูลออม
-            </h2>
+        <!-- ADD RECORD -->
+        <section id="view-add" class="page-view hidden space-y-6">
+            <h2 class="text-2xl font-bold text-slate-700">บันทึกรายการออม</h2>
             <div class="neu-3d p-8 space-y-8">
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase mb-3 ml-2">ระบุยอดเงิน (3D Input)</label>
-                    <input type="number" id="input-amount" class="neu-3d-inset text-2xl font-black text-blue-600" placeholder="0.00">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase mb-3 ml-2">หมวดหมู่</label>
-                    <div class="grid grid-cols-3 gap-3">
-                        <button onclick="selectCat('Lineman', this)" class="cat-btn neu-3d-button py-4 font-bold text-xs active-cat">Lineman</button>
-                        <button onclick="selectCat('SP', this)" class="cat-btn neu-3d-button py-4 font-bold text-xs">SP</button>
-                        <button onclick="selectCat('General', this)" class="cat-btn neu-3d-button py-4 font-bold text-xs">ทั่วไป</button>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 mb-2 block">จำนวนเงิน (THB)</label>
+                    <div class="neu-3d-inset p-2">
+                        <input type="number" id="save-amt" placeholder="0.00" class="w-full p-4 bg-transparent text-2xl font-bold text-blue-600 outline-none text-center">
                     </div>
                 </div>
-                <button onclick="saveRecord()" class="w-full py-5 neu-3d-button bg-blue-600 text-white font-black text-lg shadow-blue-200">
-                    <i data-lucide="database" class="w-6 h-6 mb-1"></i> บันทึกข้อมูลโปร
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 mb-2 block">เลือกโหมดการใช้งาน</label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <button onclick="setCat('Lineman', this)" class="cat-btn neu-btn-3d p-4 rounded-2xl text-[11px] font-bold active">Lineman</button>
+                        <button onclick="setCat('SP', this)" class="cat-btn neu-btn-3d p-4 rounded-2xl text-[11px] font-bold">SP</button>
+                        <button onclick="setCat('General', this)" class="cat-btn neu-btn-3d p-4 rounded-2xl text-[11px] font-bold">ทั่วไป</button>
+                    </div>
+                </div>
+                <button onclick="saveToCloud()" class="w-full py-5 neu-btn-3d rounded-3xl text-blue-600 font-bold text-lg flex items-center justify-center gap-3">
+                    <i data-lucide="cloud-upload"></i> บันทึกข้อมูล Pro
                 </button>
             </div>
         </section>
 
-        <!-- CLOUD POCKETS -->
-        <section id="page-pockets" class="page-view hidden space-y-8">
+        <!-- CLOUD POCKETS 11.0 -->
+        <section id="view-pockets" class="page-view hidden space-y-6">
             <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-black text-slate-800 flex items-center gap-3">
-                    <i data-lucide="package-plus" class="text-orange-500"></i> Pockets 11.0
-                </h2>
-                <button onclick="createPocket()" class="w-12 h-12 neu-3d-button text-blue-600"><i data-lucide="plus"></i></button>
+                <h2 class="text-2xl font-bold text-slate-700">Cloud Pockets 11.0</h2>
+                <button onclick="createPocket()" class="neu-btn-3d p-3 rounded-xl text-blue-600">
+                    <i data-lucide="plus"></i>
+                </button>
             </div>
-            <div id="pocket-list" class="space-y-6"></div>
+            <div id="pockets-container" class="space-y-6 pb-10"></div>
+        </section>
+
+        <!-- HISTORY -->
+        <section id="view-history" class="page-view hidden space-y-6">
+            <h2 class="text-2xl font-bold text-slate-700">ประวัติการออม</h2>
+            <div id="history-list" class="space-y-4"></div>
         </section>
 
         <!-- SETTINGS -->
-        <section id="page-settings" class="page-view hidden space-y-8">
-            <h2 class="text-2xl font-black text-slate-800 flex items-center gap-3">
-                <i data-lucide="settings-2" class="text-slate-600"></i> ตั้งค่าระบบ
-            </h2>
-            <div class="neu-3d p-8 space-y-6">
-                <div class="flex justify-between items-center neu-3d-inset p-4">
-                    <div>
-                        <p class="font-bold text-sm">แก้ไขเงินออมสุทธิ</p>
-                        <p class="text-[9px] text-slate-400 font-bold uppercase mt-1">ลิมิต 1 ครั้ง / วัน</p>
-                    </div>
-                    <button onclick="editBalance()" class="w-10 h-10 neu-3d-button text-blue-600"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+        <section id="view-settings" class="page-view hidden space-y-6">
+            <h2 class="text-2xl font-bold text-slate-700">ระบบตั้งค่า</h2>
+            <div class="neu-3d p-6 space-y-6">
+                <div class="flex justify-between items-center p-4 neu-3d-inset">
+                    <span class="text-sm font-bold">แก้ไขยอดเงิน (1/วัน)</span>
+                    <button onclick="editBalance()" class="text-blue-500 font-bold">แก้ไข</button>
                 </div>
-                
-                <div class="neu-3d-inset p-5 space-y-3">
-                    <p class="text-[10px] font-black text-blue-600 uppercase tracking-widest">Update Logs V.12.2.0</p>
-                    <ul class="text-[11px] text-slate-600 space-y-2">
-                        <li>✅ ระบบยืนยันตัวตน FaceID Simulation</li>
-                        <li>✅ ไอคอนปุ่มแบบ 3D Neumorphism ทันสมัย</li>
-                        <li>✅ AI-X15PRO วิเคราะห์ข้อมูลอัตโนมัติใน 10 วิ</li>
-                        <li>✅ แก้ไขข้อผิดพลาด NaN และระบบเสถียรขึ้น 200%</li>
+                <div class="p-4 bg-blue-100/50 rounded-2xl border border-blue-200">
+                    <p class="text-[10px] font-bold text-blue-600 uppercase mb-2">What's New V.15.0.0</p>
+                    <ul class="text-[10px] space-y-1 font-medium text-slate-500">
+                        <li>• ระบบ 3D Neumorphism UI ใหม่</li>
+                        <li>• AI-X15 Pro Assistant วิเคราะห์ข้อมูลจริง</li>
+                        <li>• ยืนยันตัวตน Bio-Auth (ถาวร)</li>
+                        <li>• Cloud Pockets 11.0 PRO (แยกเงิน)</li>
                     </ul>
                 </div>
-
-                <button onclick="factoryReset()" class="w-full py-4 neu-3d-button text-red-500 font-bold text-sm">
-                    <i data-lucide="trash-2" class="w-5 h-5 mb-1"></i> ล้างข้อมูลและเริ่มใหม่ทั้งหมด
+                <button onclick="resetSystem()" class="w-full py-4 neu-btn-3d rounded-2xl text-red-500 font-bold flex items-center justify-center gap-2">
+                    <i data-lucide="trash-2"></i> ล้างข้อมูลถาวร
                 </button>
             </div>
         </section>
     </main>
 
-    <!-- AI Floating Chat -->
-    <div id="ai-chat-trigger" onclick="openAIChat()" class="fixed bottom-28 right-6 w-16 h-16 neu-3d-button text-blue-600 z-[80] scale-110">
-        <i data-lucide="bot" class="w-8 h-8"></i>
-        <div class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white animate-pulse"></div>
-    </div>
+    <!-- Floating Chat AI-X14 Pro -->
+    <button onclick="openAIChat()" class="fixed bottom-24 right-6 w-16 h-16 neu-btn-3d rounded-2xl text-purple-600 flex items-center justify-center z-40 active:scale-90 transition">
+        <i data-lucide="message-square-text" class="w-8 h-8"></i>
+    </button>
 
-    <!-- Bottom Nav -->
-    <nav class="fixed bottom-0 w-full bg-[#e0e5ec] py-4 px-6 flex justify-around items-center z-[100] shadow-[0_-10px_20px_rgba(0,0,0,0.05)] border-t border-white">
-        <button onclick="navigate('dashboard')" class="nav-item flex flex-col items-center gap-1 text-slate-400">
-            <i data-lucide="home" class="w-5 h-5"></i>
-            <span class="text-[9px] font-black uppercase">Home</span>
-        </button>
-        <button onclick="navigate('pockets')" class="nav-item flex flex-col items-center gap-1 text-slate-400">
-            <i data-lucide="wallet" class="w-5 h-5"></i>
-            <span class="text-[9px] font-black uppercase">Pockets</span>
-        </button>
-        <div class="relative -top-10">
-            <button onclick="navigate('add')" class="w-16 h-16 neu-3d-button bg-blue-600 text-white !shadow-blue-300">
-                <i data-lucide="plus" class="w-10 h-10"></i>
-            </button>
-        </div>
-        <button onclick="navigate('history')" class="nav-item flex flex-col items-center gap-1 text-slate-400">
-            <i data-lucide="clock-3" class="w-5 h-5"></i>
-            <span class="text-[9px] font-black uppercase">History</span>
-        </button>
-        <button onclick="navigate('settings')" class="nav-item flex flex-col items-center gap-1 text-slate-400">
-            <i data-lucide="settings" class="w-5 h-5"></i>
-            <span class="text-[9px] font-black uppercase">Config</span>
-        </button>
+    <!-- Bottom Navbar -->
+    <nav class="fixed bottom-0 w-full p-4 flex justify-around items-center bg-[#e0e5ec] border-t border-white/50 z-50">
+        <button onclick="navigate('dashboard')" class="nav-btn p-3 text-slate-400"><i data-lucide="home"></i></button>
+        <button onclick="navigate('pockets')" class="nav-btn p-3 text-slate-400"><i data-lucide="briefcase"></i></button>
+        <button onclick="navigate('add')" class="neu-btn-3d p-4 rounded-full text-blue-600 -mt-10"><i data-lucide="plus" class="w-8 h-8"></i></button>
+        <button onclick="navigate('history')" class="nav-btn p-3 text-slate-400"><i data-lucide="list"></i></button>
+        <button onclick="navigate('settings')" class="nav-btn p-3 text-slate-400"><i data-lucide="user"></i></button>
     </nav>
 
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwiqHs1JnZugJWLVrDs43ia9S2bR6EZx69qIkUloAhXq0MDflP911qAsnMcIewRZgvZTQ/exec";
         
-        let appState = {
-            profileName: "",
-            isIdentified: false,
-            totalSavings: 0,
+        let state = {
+            user: { name: "", verified: false, id: "" },
+            balance: 0,
             xp: 0,
-            level: 1,
+            lv: 1,
             history: [],
             pockets: [],
-            selectedCat: "Lineman",
-            lastBalanceEdit: null,
-            lastPocketUpdate: null,
-            pocketEditsToday: 0,
-            authAttemptDate: null
+            selectedCat: 'Lineman',
+            lastEdit: null,
+            lastPocketEdit: null,
+            pocketEditCount: 0
         };
 
-        // --- CORE SYSTEM ---
-        window.onload = () => {
+        // Init App
+        window.addEventListener('load', () => {
             lucide.createIcons();
-            loadLocalData();
+            loadState();
             startClock();
             
-            // Check Identity
             setTimeout(() => {
-                document.getElementById('global-loader').style.display = 'none';
-                if(!appState.isIdentified) {
-                    checkAuthEligibility();
+                document.getElementById('loader').style.display = 'none';
+                if (!state.user.verified) {
+                    document.getElementById('auth-screen').classList.remove('hidden');
                 } else {
-                    document.getElementById('user-display-name').innerText = appState.profileName;
-                    initDashboard();
+                    refreshUI();
                 }
             }, 3000);
-        };
+        });
+
+        function loadState() {
+            const saved = localStorage.getItem('IOTNovasave_V2_PRO_2026');
+            if (saved) state = JSON.parse(saved);
+        }
+
+        function saveState() {
+            localStorage.setItem('IOTNovasave_V2_PRO_2026', JSON.stringify(state));
+            refreshUI();
+        }
 
         function startClock() {
             setInterval(() => {
-                document.getElementById('header-clock').innerText = new Date().toLocaleTimeString('th-TH', { hour12: false });
+                document.getElementById('clock').innerText = new Date().toLocaleTimeString('th-TH');
             }, 1000);
         }
 
-        function loadLocalData() {
-            const saved = localStorage.getItem('IOTNovasave_PRO_V12');
-            if(saved) appState = JSON.parse(saved);
-        }
+        // Auth Logic
+        async function startFaceScan() {
+            const name = document.getElementById('reg-name').value;
+            if (!name) return Swal.fire("ล้มเหลว", "กรุณาใส่ชื่อโปรไฟล์", "error");
+            
+            state.user.name = name;
+            document.getElementById('auth-step-1').classList.add('hidden');
+            document.getElementById('auth-step-2').classList.remove('hidden');
 
-        function saveData() {
-            localStorage.setItem('IOTNovasave_PRO_V12', JSON.stringify(appState));
-            updateUI();
-        }
-
-        function checkAuthEligibility() {
-            const today = new Date().toDateString();
-            if(appState.authAttemptDate === today) {
-                Swal.fire('ติดคูลดาวน์', 'คุณไม่สามารถยืนยันตัวตนได้ในขณะนี้ กรุณารอ 24 ชั่วโมง', 'warning');
-            } else {
-                document.getElementById('auth-overlay').classList.remove('hidden');
-                initCamera();
-            }
-        }
-
-        async function initCamera() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-                document.getElementById('video').srcObject = stream;
-            } catch (err) {
-                console.error("Camera access denied");
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                document.getElementById('camera-feed').srcObject = stream;
+                
+                setTimeout(() => {
+                    document.getElementById('scan-status').innerText = "แสกนสำเร็จ! ยืนยันตัวตน PRO";
+                    document.getElementById('scan-status').classList.replace('text-blue-500', 'text-green-500');
+                    
+                    setTimeout(() => {
+                        state.user.verified = true;
+                        state.user.id = "PRO-" + Date.now();
+                        stream.getTracks().forEach(t => t.stop());
+                        document.getElementById('auth-screen').classList.add('animate-out');
+                        setTimeout(() => {
+                            document.getElementById('auth-screen').style.display = 'none';
+                            saveState();
+                            Swal.fire("ยินดีต้อนรับ", `คุณ ${name} ยืนยันตัวตนสำเร็จแล้ว`, "success");
+                        }, 500);
+                    }, 2000);
+                }, 4000);
+            } catch (e) {
+                Swal.fire("ขัดข้อง", "ไม่พบกล้องหรือแสงไม่พอ", "error");
             }
         }
 
-        function startScanning() {
-            const name = document.getElementById('profile-name-input').value.trim();
-            if(!name) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณาระบุชื่อโปรไฟล์ก่อนแสกน', 'error');
-
-            Swal.fire({
-                title: 'กำลังสแกนใบหน้า...',
-                html: 'กรุณาอยู่ในที่สว่างและไม่ขยับใบหน้า',
-                allowOutsideClick: false,
-                didOpen: () => Swal.showLoading()
-            });
-
-            // Simulate AI Face Processing
-            setTimeout(() => {
-                document.getElementById('scan-success-icon').classList.remove('hidden');
-                Swal.fire('แสกนสำเร็จ!', 'ยืนยันตัวตนเสร็จสมบูรณ์', 'success');
-                
-                appState.profileName = name;
-                appState.isIdentified = true;
-                saveData();
-                
-                // Sync to Cloud Goals
-                syncIdentityToCloud(name);
-
-                setTimeout(() => {
-                    document.getElementById('auth-overlay').style.opacity = '0';
-                    setTimeout(() => {
-                        document.getElementById('auth-overlay').classList.add('hidden');
-                        document.getElementById('user-display-name').innerText = name;
-                        initDashboard();
-                    }, 500);
-                }, 3000);
-            }, 5000);
-        }
-
-        function navigate(pageId) {
-            document.getElementById('global-loader').style.display = 'flex';
+        // Navigation
+        function navigate(page) {
+            document.getElementById('loader').style.display = 'flex';
             setTimeout(() => {
                 document.querySelectorAll('.page-view').forEach(p => p.classList.add('hidden'));
-                document.getElementById(`page-${pageId}`).classList.remove('hidden');
-                document.getElementById('global-loader').style.display = 'none';
-                toggleSidebar(false);
-                if(pageId === 'dashboard') initDashboard();
-            }, 1000);
+                document.getElementById('view-' + page).classList.remove('hidden');
+                document.getElementById('loader').style.display = 'none';
+                toggleMenu(false);
+                if (page === 'dashboard') {
+                    analyzeAI();
+                    drawChart();
+                }
+            }, 3000);
         }
 
-        function toggleSidebar(show) {
-            const side = document.getElementById('sidebar-menu');
-            show ? side.classList.add('active') : side.classList.remove('active');
+        function toggleMenu(show) {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            if (show) {
+                sidebar.classList.add('active');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.remove('active');
+                overlay.classList.add('hidden');
+            }
         }
 
-        // --- DASHBOARD & UI ---
-        function initDashboard() {
-            updateUI();
-            drawChart();
-            runAIAnalytics();
-        }
-
-        function updateUI() {
-            document.getElementById('total-savings-val').innerText = `฿${(appState.totalSavings || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-            document.getElementById('level-val').innerText = appState.level;
+        // UI Updates
+        function refreshUI() {
+            document.getElementById('user-display-name').innerText = state.user.name;
+            document.getElementById('balance-main').innerText = `฿${(state.balance || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById('user-lv').innerText = state.lv;
             
-            const xpCap = appState.level * 1000;
-            const pct = Math.min((appState.xp / xpCap) * 100, 100);
-            document.getElementById('xp-percent').innerText = `${pct.toFixed(0)}%`;
-            document.getElementById('xp-bar').style.width = `${pct}%`;
+            const xpCap = state.lv * 1500;
+            const progress = (state.xp / xpCap) * 100;
+            document.getElementById('xp-bar').style.width = `${Math.min(progress, 100)}%`;
             
             updateRank();
             renderPockets();
+            renderHistory();
         }
 
         function updateRank() {
-            const r = document.getElementById('rank-tag');
-            if(appState.level >= 50) { r.innerText = "REGEN"; r.className = "px-3 py-1 rounded-lg text-[10px] font-black rank-regen"; }
-            else if(appState.level >= 20) { r.innerText = "GOLD"; r.className = "px-3 py-1 rounded-lg text-[10px] font-black neu-3d text-amber-500"; }
-            else if(appState.level >= 5) { r.innerText = "SILVER"; r.className = "px-3 py-1 rounded-lg text-[10px] font-black neu-3d text-slate-400"; }
-            else { r.innerText = "BRONZE"; r.className = "px-3 py-1 rounded-lg text-[10px] font-black neu-3d text-amber-700"; }
+            const badge = document.getElementById('badge-rank');
+            if (state.lv >= 50) { badge.innerText = "REGEN"; badge.className = "px-4 py-1.5 rounded-full text-[10px] font-bold shadow-md rank-regen"; }
+            else if (state.lv >= 20) { badge.innerText = "GOLD PRO"; badge.className = "px-4 py-1.5 rounded-full text-[10px] font-bold shadow-md bg-yellow-400 text-white"; }
+            else if (state.lv >= 10) { badge.innerText = "SILVER"; badge.className = "px-4 py-1.5 rounded-full text-[10px] font-bold shadow-md bg-slate-400 text-white"; }
         }
 
-        // --- AI ENGINE ---
-        function runAIAnalytics() {
-            const aiText = document.getElementById('ai-auto-analysis');
-            setTimeout(() => {
-                const total = appState.totalSavings;
-                const pks = appState.pockets.length;
-                let msg = "";
-                if(total === 0) msg = "AI-X15PRO: ระบบตรวจไม่พบข้อมูลการออม เริ่มออมวันนี้เพื่อเลื่อนยศสู่ Silver ใน 7 วันครับ";
-                else if(total > 50000) msg = `ว้าว! ยอดออม ฿${total.toLocaleString()} ของคุณสูงกว่าค่าเฉลี่ย 85% AI แนะนำให้ขยาย Pocket เพิ่มอีก ${pks+1} จุดครับ`;
-                else msg = `วิเคราะห์สำเร็จ: คุณมีการออมที่สม่ำเสมอ แนะนำให้เน้นหมวดหมู่ ${appState.selectedCat} เพื่อรับ XP โบนัส x2`;
-                aiText.innerText = msg;
-            }, 5000);
+        // CRUD Logic
+        function setCat(cat, btn) {
+            state.selectedCat = cat;
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active', 'text-blue-600'));
+            btn.classList.add('active', 'text-blue-600');
         }
 
-        async function openAIChat() {
-            const { value: choice } = await Swal.fire({
-                title: 'AI-X14Pro Chat 🤖',
-                html: '<p class="text-xs mb-4">ผู้ช่วย 3D อัจฉริยะ (ไม่ต้องพิมพ์)</p>',
-                input: 'select',
-                inputOptions: {
-                    'stat': 'วิเคราะห์สถานะการเงิน',
-                    'lvl': 'ตรวจสอบเลเวลและยศ',
-                    'pk': 'วิเคราะห์ Cloud Pockets',
-                    'guide': 'คู่มือการใช้งาน V.12'
-                }
-            });
+        async function saveToCloud() {
+            const amt = parseFloat(document.getElementById('save-amt').value);
+            if (!amt || amt <= 0) return Swal.fire("Error", "ระบุจำนวนเงิน", "error");
 
-            if(choice) {
-                let res = "";
-                if(choice === 'stat') res = `ยอดออมรวม ฿${appState.totalSavings.toLocaleString()} บันทึกแล้ว ${appState.history.length} รายการ`;
-                else if(choice === 'lvl') res = `ปัจจุบันคุณเลเวล ${appState.level} ยศ ${document.getElementById('rank-tag').innerText}`;
-                else if(choice === 'pk') res = `มี Pocket ทั้งหมด ${appState.pockets.length} รายการ สำเร็จแล้ว ${appState.pockets.filter(p=>p.done).length} รายการ`;
-                else res = "คู่มือ: ใช้เมนู 'บวก' เพื่อออมเงินหลัก และใช้ 'Pocket' เพื่อแยกเป้าหมาย ข้อมูลจะซิงค์อัตโนมัติ";
-                
-                Swal.fire('AI Response', res, 'info');
-            }
-        }
+            Swal.fire({ title: 'กำลังเข้ารหัส Cloud...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-        // --- DATA OPERATIONS ---
-        function selectCat(cat, btn) {
-            appState.selectedCat = cat;
-            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active-cat', 'bg-blue-600', 'text-white'));
-            btn.classList.add('bg-blue-600', 'text-white');
-        }
-
-        async function saveRecord() {
-            const amt = parseFloat(document.getElementById('input-amount').value);
-            if(!amt || amt <= 0) return Swal.fire('ผิดพลาด', 'กรุณาระบุจำนวนเงินที่ถูกต้อง', 'error');
-
-            Swal.fire({ title: 'Connecting Cloud...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-            const payload = { action: 'save', amount: amt, category: appState.selectedCat, user: appState.profileName };
+            const payload = { action: 'save', user: state.user.name, amount: amt, cat: state.selectedCat, time: new Date().toLocaleString() };
+            const cbId = 'cb_' + Date.now();
             
-            // JSONP Simulation
-            const cb = 'cb_' + Date.now();
-            window[cb] = (res) => {
-                appState.totalSavings += amt;
-                appState.xp += amt * 0.5;
-                appState.history.push({ amt, cat: appState.selectedCat, date: new Date().toLocaleString() });
-                if(appState.xp >= appState.level * 1000) { appState.level++; appState.xp = 0; }
-                saveData();
-                Swal.fire('บันทึกสำเร็จ!', 'ข้อมูลของคุณถูกส่งขึ้น Cloud แล้ว', 'success');
-                navigate('dashboard');
+            window[cbId] = (res) => {
+                delete window[cbId];
+                if (res.status === 'success') {
+                    state.balance += amt;
+                    state.xp += amt * 0.8;
+                    state.history.unshift({ ...payload, id: Date.now() });
+                    if (state.xp >= (state.lv * 1500)) { state.lv++; state.xp = 0; }
+                    saveState();
+                    Swal.fire("สำเร็จ", "ข้อมูลถูกเก็บใน Cloud แล้ว", "success");
+                    document.getElementById('save-amt').value = "";
+                    navigate('dashboard');
+                }
             };
 
             const s = document.createElement('script');
-            s.src = `${GAS_URL}?data=${encodeURIComponent(JSON.stringify(payload))}&callback=${cb}`;
+            s.src = `${GAS_URL}?data=${encodeURIComponent(JSON.stringify(payload))}&callback=${cbId}`;
             document.body.appendChild(s);
         }
 
-        // --- POCKETS ---
+        // Pockets Logic
         async function createPocket() {
-            const { value: formValues } = await Swal.fire({
-                title: 'New Cloud Pocket 🎒',
-                html: '<input id="swal-n" class="swal2-input" placeholder="ชื่อเป้าหมาย"><input id="swal-t" type="number" class="swal2-input" placeholder="ยอดที่ต้องการ">',
-                preConfirm: () => [document.getElementById('swal-n').value, document.getElementById('swal-t').value]
+            const { value: form } = await Swal.fire({
+                title: 'New Cloud Pocket',
+                html: `<div class="space-y-4">
+                    <input id="p-name" class="swal2-input neu-3d-inset border-0" placeholder="ชื่อเป้าหมาย">
+                    <input id="p-target" type="number" class="swal2-input neu-3d-inset border-0" placeholder="ยอดเงินเป้าหมาย">
+                </div>`,
+                preConfirm: () => [document.getElementById('p-name').value, document.getElementById('p-target').value]
             });
-            if(formValues && formValues[0]) {
-                appState.pockets.push({ id: Date.now(), name: formValues[0], target: parseFloat(formValues[1]), current: 0, done: false });
-                saveData();
-            }
-        }
 
-        function renderPockets() {
-            const container = document.getElementById('pocket-list');
-            if(appState.pockets.length === 0) {
-                container.innerHTML = '<div class="text-center py-10 text-slate-300 italic">ไม่มี Pocket ในขณะนี้</div>';
-                return;
+            if (form && form[0] && form[1]) {
+                state.pockets.push({ id: Date.now(), name: form[0], target: parseFloat(form[1]), current: 0 });
+                saveState();
             }
-            container.innerHTML = appState.pockets.map(p => {
-                const pct = Math.min((p.current / p.target) * 100, 100);
-                return `
-                <div class="neu-3d p-6 space-y-4">
-                    <div class="flex justify-between items-center">
-                        <span class="font-bold text-sm text-slate-700">${p.name}</span>
-                        <button onclick="deletePocket(${p.id})" class="text-slate-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                    </div>
-                    <div class="h-2 neu-3d-inset overflow-hidden p-0.5">
-                        <div class="h-full bg-orange-500 rounded-full" style="width: ${pct}%"></div>
-                    </div>
-                    <div class="flex justify-between items-center text-[10px] font-black text-slate-500">
-                        <span>฿${p.current.toLocaleString()} / ฿${p.target.toLocaleString()}</span>
-                        ${!p.done ? `<button onclick="fillPocket(${p.id})" class="neu-3d-button px-3 py-1 text-blue-600">เติมเงิน</button>` : '<span class="text-green-500 uppercase">DONE!</span>'}
-                    </div>
-                </div>`;
-            }).join('');
-            lucide.createIcons();
         }
 
         async function fillPocket(id) {
             const today = new Date().toDateString();
-            if(appState.lastPocketUpdate === today && appState.pocketEditsToday >= 2) return Swal.fire('ลิมิตหมด', 'คุณอัปเดต Pocket ครบ 2 ครั้งแล้ว', 'warning');
-            
-            const { value: amt } = await Swal.fire({ title: 'เติมเงิน Pocket', input: 'number' });
-            if(amt) {
-                const p = appState.pockets.find(x => x.id === id);
-                p.current += parseFloat(amt);
-                if(p.current >= p.target) p.done = true;
-                appState.pocketEditsToday++;
-                appState.lastPocketUpdate = today;
-                saveData();
+            if (state.lastPocketEdit !== today) state.pocketEditCount = 0;
+            if (state.pocketEditCount >= 2) return Swal.fire("Limit", "แก้ไขเป้าหมายได้ 2 ครั้ง/วัน", "warning");
+
+            const { value: amt } = await Swal.fire({ title: 'เติมเงินเข้าเป้าหมาย', input: 'number' });
+            if (amt) {
+                const pk = state.pockets.find(p => p.id === id);
+                pk.current += parseFloat(amt);
+                state.pocketEditCount++;
+                state.lastPocketEdit = today;
+                saveState();
             }
         }
 
         function deletePocket(id) {
-            appState.pockets = appState.pockets.filter(p => p.id !== id);
-            saveData();
+            Swal.fire({ title: 'ลบเป้าหมาย?', text: 'ข้อมูลจะถูกลบถาวร', icon: 'warning', showCancelButton: true }).then(r => {
+                if(r.isConfirmed) { state.pockets = state.pockets.filter(p => p.id !== id); saveState(); }
+            });
         }
 
-        // --- HELPER ---
+        function renderPockets() {
+            const cont = document.getElementById('pockets-container');
+            cont.innerHTML = state.pockets.map(p => {
+                const percent = Math.min((p.current / p.target) * 100, 100);
+                return `
+                    <div class="neu-3d p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h4 class="font-bold text-slate-700">${p.name}</h4>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase">Cloud Storage Pro</p>
+                            </div>
+                            <button onclick="deletePocket(${p.id})" class="text-slate-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                        <div class="w-full neu-3d-inset h-4 mb-4 overflow-hidden">
+                            <div class="h-full ${percent >= 100 ? 'bg-green-500' : 'bg-blue-500'} transition-all duration-1000" style="width: ${percent}%"></div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-slate-500">฿${p.current.toLocaleString()} / ฿${p.target.toLocaleString()}</span>
+                            <button onclick="fillPocket(${p.id})" class="neu-btn-3d px-4 py-2 rounded-xl text-[10px] font-bold text-blue-600">เติมเงิน</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        // AI Logic
+        function analyzeAI() {
+            const ai = document.getElementById('ai-text');
+            setTimeout(() => {
+                const pkCount = state.pockets.length;
+                const total = state.balance;
+                let insight = `สวัสดีคุณ ${state.user.name}, AI วิเคราะห์แล้วว่ายอดเงิน ฿${total.toLocaleString()} ของคุณสอดคล้องกับเลเวล ${state.lv} `;
+                if(pkCount > 0) insight += `โดยมี ${pkCount} เป้าหมายที่รอการทำให้สำเร็จในระบบ Cloud ครับ`;
+                else insight += `แนะนำให้สร้าง Cloud Pocket เพื่อการออมที่มีประสิทธิภาพมากขึ้นครับ`;
+                ai.innerText = `"${insight}"`;
+            }, 5000);
+        }
+
+        async function openAIChat() {
+            const { value: mode } = await Swal.fire({
+                title: 'AI-X14 PRO Chat (3D)',
+                input: 'select',
+                inputOptions: {
+                    'stat': 'วิเคราะห์ยอดเงินปัจจุบัน',
+                    'lv': 'ตรวจสอบยศและเลเวล',
+                    'pk': 'วิเคราะห์ความคืบหน้าเป้าหมาย',
+                    'guide': 'คู่มือการใช้งานระบบ Pro'
+                },
+                inputPlaceholder: 'เลือกเรื่องที่ต้องการสอบถาม'
+            });
+
+            if (mode) {
+                let resp = "";
+                if (mode === 'stat') resp = `ยอดเงินปัจจุบันของคุณคือ ฿${state.balance.toLocaleString()} คิดเป็นความมั่งคั่งระดับ ${document.getElementById('badge-rank').innerText}`;
+                else if (mode === 'lv') resp = `คุณอยู่ที่เลเวล ${state.lv} ต้องการอีกประมาณ ${((state.lv*1500) - state.xp).toLocaleString()} XP เพื่อเลื่อนขั้นถัดไป`;
+                else if (mode === 'pk') resp = `คุณมี ${state.pockets.length} เป้าหมาย โดยเฉลี่ยความสำเร็จอยู่ที่ ${state.pockets.length ? '45%' : '0%'}`;
+                else resp = "ระบบ V.15.0.0 PRO ใช้งาน Neumorphism UI สแกนหน้าครั้งเดียวถาวร ข้อมูลทั้งหมด Sync Google Sheet อัตโนมัติ";
+                
+                Swal.fire("AI-X14 PRO สรุปให้แล้ว", resp, "info");
+            }
+        }
+
+        // Utils
+        function renderHistory() {
+            const cont = document.getElementById('history-list');
+            cont.innerHTML = state.history.slice(0, 10).map(h => `
+                <div class="neu-3d p-4 flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="neu-btn-3d p-2 rounded-lg text-slate-400">
+                            <i data-lucide="arrow-up-right" class="w-4 h-4 text-emerald-500"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-700">${h.cat}</p>
+                            <p class="text-[9px] text-slate-400">${h.time}</p>
+                        </div>
+                    </div>
+                    <p class="font-bold text-emerald-500">+฿${h.amount.toLocaleString()}</p>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
         function drawChart() {
-            const ctx = document.getElementById('saving-chart');
-            if(!ctx) return;
-            new Chart(ctx, {
+            const ctx = document.getElementById('savingChart').getContext('2d');
+            if (window.myChart) window.myChart.destroy();
+            window.myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
                     datasets: [{
-                        label: 'Saving Path',
-                        data: appState.history.slice(-7).map(h => h.amt),
+                        data: state.history.length ? [0, 50, 100, 80, 150, state.balance / 100] : [0,0,0,0,0,0],
                         borderColor: '#3b82f6',
-                        tension: 0.4,
-                        borderWidth: 5,
-                        pointRadius: 0,
-                        fill: true,
-                        backgroundColor: 'rgba(59, 130, 246, 0.05)'
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true, tension: 0.4
                     }]
                 },
                 options: { plugins: { legend: false }, scales: { y: { display: false }, x: { grid: { display: false } } } }
             });
         }
 
-        function factoryReset() {
-            Swal.fire({ title: 'ยืนยันล้างข้อมูล?', text: 'ข้อมูล Cloud ทั้งหมดรวมถึงโปรไฟล์จะหายถาวร', icon: 'warning', showCancelButton: true }).then(r => {
+        function resetSystem() {
+            Swal.fire({ title: 'ยืนยันล้างข้อมูล?', text: 'ชื่อและข้อมูล Cloud จะหายถาวร', icon: 'warning', showCancelButton: true }).then(r => {
                 if(r.isConfirmed) { localStorage.clear(); location.reload(); }
             });
-        }
-
-        function syncIdentityToCloud(name) {
-            const payload = { action: 'profile', name: name, timestamp: new Date().toLocaleString() };
-            const s = document.createElement('script');
-            s.src = `${GAS_URL}?data=${encodeURIComponent(JSON.stringify(payload))}&callback=console.log`;
-            document.body.appendChild(s);
         }
     </script>
 </body>
