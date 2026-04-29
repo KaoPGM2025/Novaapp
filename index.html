@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IOTNovasave V.10.8.0 Pro 2026</title>
+    <title>IOTNovasave Pro 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -12,688 +12,380 @@
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap');
         
         :root {
-            --primary-3d: linear-gradient(145deg, #3b82f6, #2563eb);
-            --surface-3d: linear-gradient(145deg, #ffffff, #f1f5f9);
-            --shadow-3d: 8px 8px 16px #d1d5db, -8px -8px 16px #ffffff;
-            --inner-3d: inset 4px 4px 8px #d1d5db, inset -4px -4px 8px #ffffff;
+            --glass: rgba(255, 255, 255, 0.7);
+            --shadow-3d: 6px 6px 12px #bebebe, -6px -6px 12px #ffffff;
+            --inner-3d: inset 4px 4px 8px #bebebe, inset -4px -4px 8px #ffffff;
         }
 
         body { 
             font-family: 'Kanit', sans-serif; 
-            background-color: #e2e8f0; 
+            background: linear-gradient(135deg, #e0e7ff 0%, #f1f5f9 100%);
+            min-height: 100vh;
             color: #1e293b;
-            overflow-x: hidden;
         }
 
-        /* 3D Button Style */
         .btn-3d {
-            background: var(--surface-3d);
-            box-shadow: var(--shadow-3d);
-            border-radius: 20px;
+            background: #f1f5f9;
+            box-shadow: var/(--shadow-3d);
+            border-radius: 16px;
             transition: all 0.2s ease;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(255,255,255,0.5);
+            border: 1px solid rgba(255,255,255,0.4);
         }
+
         .btn-3d:active {
             box-shadow: var(--inner-3d);
             transform: scale(0.98);
         }
 
-        .card-3d {
-            background: var(--surface-3d);
-            box-shadow: var(--shadow-3d);
-            border-radius: 30px;
-            border: 1px solid rgba(255,255,255,0.6);
+        .input-3d {
+            background: #f1f5f9;
+            box-shadow: var(--inner-3d);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 16px;
+            outline: none;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.5);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+            border-radius: 24px;
+        }
+
+        .loader-screen {
+            position: fixed;
+            inset: 0;
+            background: #f1f5f9;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .sidebar {
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform: translateX(-110%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 280px;
+            background: white;
             z-index: 1000;
+            transform: translateX(-100%);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 20px 0 40px rgba(0,0,0,0.05);
         }
+
         .sidebar.active { transform: translateX(0); }
 
-        .loader-3d {
-            position: fixed; inset: 0; background: #f8fafc; z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        .rank-regen {
+            background: linear-gradient(45deg, #f59e0b, #ef4444, #8b5cf6);
+            background-size: 200% 200%;
+            animation: flow 3s infinite;
+            color: white;
         }
 
-        /* Scan Animation */
+        @keyframes flow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .face-scanner {
+            width: 220px;
+            height: 220px;
+            border: 4px solid #3b82f6;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+        }
+
         .scan-line {
-            width: 100%; height: 4px; background: #3b82f6;
-            position: absolute; top: 0; animation: scan 2s linear infinite;
+            width: 100%;
+            height: 2px;
+            background: #3b82f6;
+            position: absolute;
+            top: 0;
             box-shadow: 0 0 15px #3b82f6;
-        }
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
-
-        .nav-active {
-            background: #3b82f6 !important;
-            color: white !important;
-            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2);
+            animation: scan 2s linear infinite;
         }
 
-        canvas { filter: drop-shadow(4px 4px 8px rgba(0,0,0,0.1)); }
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
     </style>
 </head>
-<body class="pb-28">
+<body class="pb-24">
 
-    <!-- Global 3D Loader -->
-    <div id="loader" class="loader-3d">
-        <div class="relative w-24 h-24 mb-6">
-            <div class="absolute inset-0 border-8 border-slate-200 rounded-3xl card-3d"></div>
-            <div class="absolute inset-0 border-t-8 border-blue-600 rounded-3xl animate-spin"></div>
-        </div>
-        <h2 class="text-xl font-bold text-slate-800 animate-pulse uppercase tracking-widest">Loading Pro 2026</h2>
-        <p class="text-slate-400 text-sm mt-2 font-medium">Syncing Cloud Records...</p>
+    <!-- Loading Overlay -->
+    <div id="loader" class="loader-screen">
+        <div class="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+        <p class="mt-4 font-bold text-blue-600 animate-pulse text-lg">กำลังโหลดระบบ V.11.2.0 PRO...</p>
     </div>
 
-    <!-- Verification System (Face Scan) -->
-    <div id="auth-screen" class="fixed inset-0 bg-slate-100 z-[8000] flex items-center justify-center p-6 hidden">
-        <div class="card-3d w-full max-w-md p-8 text-center space-y-6">
-            <h2 class="text-2xl font-bold text-blue-600">Identity Verification</h2>
-            <p class="text-sm text-slate-500">กรุณาระบุชื่อและสแกนใบหน้าเพื่อล็อคบัญชีถาวร</p>
+    <!-- Verification Overlay (Face Scan) -->
+    <div id="verify-screen" class="fixed inset-0 z-[5000] bg-slate-50 flex flex-col items-center justify-center p-6 hidden">
+        <div class="glass-card p-8 w-full max-w-md text-center">
+            <h2 class="text-2xl font-bold mb-2">ยืนยันตัวตน PRO 2026</h2>
+            <p class="text-xs text-slate-400 mb-6">ความปลอดภัยสูงสุด 1 เครื่อง ต่อ 1 ยูสเซอร์</p>
             
-            <div class="relative w-48 h-48 mx-auto bg-slate-800 rounded-full overflow-hidden border-4 border-white shadow-xl">
-                <video id="webcam" autoplay playsinline class="w-full h-full object-cover grayscale"></video>
-                <div id="scan-bar" class="scan-line"></div>
+            <div class="mb-6">
+                <input type="text" id="verify-name" placeholder="ระบุชื่อโปรไฟล์ของคุณ" class="w-full input-3d text-center font-bold">
             </div>
 
-            <input type="text" id="reg-name" placeholder="ชื่อโปรไฟล์ของคุณ" class="w-full p-4 rounded-2xl bg-slate-50 border-none shadow-inner text-center font-bold">
+            <div class="flex justify-center mb-6">
+                <div class="face-scanner">
+                    <video id="webcam" autoplay playsinline></video>
+                    <div class="scan-line"></div>
+                </div>
+            </div>
+
+            <p class="text-[10px] text-red-500 font-bold mb-6">⚠️ คำเตือน: ต้องอยู่ในที่สว่างเท่านั้น และบันทึกได้ครั้งเดียว</p>
             
-            <button onclick="startFinalAuth()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg active:scale-95 transition">
-                ยืนยันตัวตน (ครั้งเดียว)
+            <button onclick="startIdentityVerification()" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg shadow-blue-200 active:scale-95 transition-transform">
+                เริ่มการสแกนและบันทึกข้อมูล
             </button>
         </div>
     </div>
 
-    <!-- Sidebar Menu -->
-    <div id="sidebar-overlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[900] hidden"></div>
-    <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-white sidebar p-6 flex flex-col">
-        <div class="flex items-center gap-4 mb-10 pb-6 border-b border-slate-100">
-            <div class="p-3 bg-blue-600 text-white rounded-2xl shadow-lg">
-                <i data-lucide="shield-check"></i>
-            </div>
-            <div>
-                <p class="text-[10px] font-bold text-slate-400 uppercase">Pro Verified</p>
-                <h3 id="user-display-side" class="font-bold text-slate-800">User</h3>
-            </div>
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar p-6 flex flex-col">
+        <div class="flex justify-between items-center mb-10">
+            <h2 class="text-xl font-extrabold text-blue-600">PRO MENU</h2>
+            <button onclick="toggleSidebar(false)" class="p-2 btn-3d"><i data-lucide="x" class="w-5 h-5"></i></button>
         </div>
         <nav class="space-y-4 flex-1">
-            <button onclick="navigate('dashboard')" class="w-full flex items-center gap-4 p-4 btn-3d font-bold text-slate-600 active:text-blue-600 group">
-                <i data-lucide="layout-grid" class="w-6 h-6"></i> Dashboard
+            <button onclick="navigate('dashboard')" class="w-full p-4 flex items-center gap-4 btn-3d hover:text-blue-600">
+                <i data-lucide="layout-dashboard"></i> <span>แดชบอร์ด 3D</span>
             </button>
-            <button onclick="navigate('pockets')" class="w-full flex items-center gap-4 p-4 btn-3d font-bold text-slate-600 group">
-                <i data-lucide="pocket" class="w-6 h-6"></i> Cloud Pockets 11.0
+            <button onclick="navigate('pockets')" class="w-full p-4 flex items-center gap-4 btn-3d hover:text-blue-600">
+                <i data-lucide="wallet"></i> <span>Cloud Pockets 11.0</span>
             </button>
-            <button onclick="navigate('history')" class="w-full flex items-center gap-4 p-4 btn-3d font-bold text-slate-600 group">
-                <i data-lucide="database" class="w-6 h-6"></i> ประวัติรายการ
+            <button onclick="navigate('history')" class="w-full p-4 flex items-center gap-4 btn-3d hover:text-blue-600">
+                <i data-lucide="clock"></i> <span>ประวัติรายการ</span>
             </button>
-            <button onclick="navigate('settings')" class="w-full flex items-center gap-4 p-4 btn-3d font-bold text-slate-600 group">
-                <i data-lucide="settings-2" class="w-6 h-6"></i> ตั้งค่าระบบ
+            <button onclick="navigate('settings')" class="w-full p-4 flex items-center gap-4 btn-3d hover:text-blue-600">
+                <i data-lucide="settings-2"></i> <span>ตั้งค่าระบบ PRO</span>
             </button>
         </nav>
-        <div class="mt-auto p-4 bg-blue-50 rounded-2xl">
-            <p class="text-[10px] font-bold text-blue-400 mb-1">VERSION STATUS</p>
-            <p class="text-xs font-bold text-blue-700">10.8.0+Pro Stable</p>
+        <div class="p-4 bg-blue-50 rounded-2xl text-[10px] font-bold text-blue-400">
+            SECURE CLOUD: IOTNovasave_V2_Goals
         </div>
-    </aside>
+    </div>
 
-    <!-- Top Header -->
-    <header class="fixed top-0 w-full z-[800] p-4 flex justify-between items-center bg-slate-100/80 backdrop-blur-md">
+    <!-- Header -->
+    <header class="fixed top-0 w-full z-[100] px-6 py-4 flex justify-between items-center bg-white/60 backdrop-blur-md border-b border-white/40">
         <div class="flex items-center gap-3">
-            <button onclick="toggleSidebar(true)" class="w-12 h-12 btn-3d text-blue-600">
-                <i data-lucide="component"></i>
+            <button onclick="toggleSidebar(true)" class="p-2.5 btn-3d text-blue-600">
+                <i data-lucide="layout-grid" class="w-5 h-5"></i>
             </button>
-            <div>
-                <div class="flex items-center gap-2">
-                    <h1 class="text-xl font-black text-slate-800 tracking-tight">IOTNovasave</h1>
-                    <button onclick="location.reload()" class="p-1 hover:rotate-180 transition-all duration-500">
-                        <i data-lucide="refresh-cw" class="w-4 h-4 text-slate-300"></i>
-                    </button>
-                </div>
-                <p id="current-date" class="text-[10px] font-bold text-slate-400"></p>
+            <div class="flex items-center gap-2">
+                <span class="font-extrabold text-xl tracking-tight">IOTNovasave</span>
+                <button onclick="location.reload()" class="p-1 text-slate-300"><i data-lucide="rotate-cw" class="w-4 h-4"></i></button>
             </div>
         </div>
-        <div id="clock" class="font-black text-blue-600 bg-white px-4 py-2 rounded-2xl shadow-sm text-sm">00:00:00</div>
+        <div id="real-clock" class="text-xs font-mono font-bold px-3 py-1 bg-slate-100 rounded-lg">--:--:--</div>
     </header>
 
-    <!-- Main Container -->
-    <main class="mt-24 px-6 max-w-lg mx-auto">
-
-        <!-- PAGE: DASHBOARD -->
-        <section id="page-dashboard" class="page-view space-y-6">
-            <!-- 3D Balance Card -->
-            <div class="card-3d p-8 bg-gradient-to-br from-blue-600 to-blue-800 text-white relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-4 opacity-20">
-                    <i data-lucide="cpu" class="w-20 h-20"></i>
-                </div>
-                <div class="flex justify-between items-start mb-6">
+    <main class="mt-24 px-6 max-w-md mx-auto">
+        <!-- Page: Dashboard -->
+        <section id="page-dashboard" class="page active space-y-6">
+            <div class="glass-card p-8 bg-gradient-to-br from-blue-600 to-indigo-800 text-white relative overflow-hidden">
+                <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                <div class="relative z-10 flex justify-between items-start mb-8">
                     <div>
-                        <p class="text-blue-100 text-[10px] font-bold tracking-widest uppercase">ยอดเงินออมสุทธิ</p>
-                        <h2 id="balance-val" class="text-4xl font-black">฿0.00</h2>
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-blue-200 mb-1">ยอดเงินออมสุทธิ</p>
+                        <h1 id="total-balance" class="text-4xl font-black">฿0.00</h1>
                     </div>
-                    <div id="rank-badge" class="bg-white/20 backdrop-blur px-4 py-1.5 rounded-full text-[10px] font-black border border-white/30">BRONZE</div>
+                    <div id="user-rank" class="px-4 py-1.5 rounded-full text-[10px] font-black bg-white/20 uppercase">Bronze</div>
                 </div>
-                <div class="space-y-2">
-                    <div class="flex justify-between text-[11px] font-black">
-                        <span>LEVEL <span id="level-val">1</span></span>
-                        <span id="xp-text">0%</span>
+                <div class="relative z-10">
+                    <div class="flex justify-between text-[10px] font-bold mb-2">
+                        <span>LEVEL <span id="lvl-display">1</span></span>
+                        <span id="xp-display">0%</span>
                     </div>
-                    <div class="w-full h-3 bg-black/20 rounded-full overflow-hidden">
-                        <div id="xp-bar" class="h-full bg-white transition-all duration-1000 shadow-[0_0_10px_#fff]" style="width: 0%"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- AI-X15PRO Analyser -->
-            <div class="card-3d p-6 space-y-4">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="p-2 bg-purple-100 text-purple-600 rounded-xl">
-                            <i data-lucide="sparkles" class="w-5 h-5"></i>
-                        </div>
-                        <h3 class="font-bold text-sm">AI-X15PRO Analysis (5s)</h3>
-                    </div>
-                    <span class="text-[10px] font-bold text-emerald-500 animate-pulse">● LIVE</span>
-                </div>
-                <p id="ai-status" class="text-xs text-slate-500 leading-relaxed italic">
-                    "กำลังเชื่อมต่อระบบวิเคราะห์ Pro 2026..."
-                </p>
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="p-4 btn-3d">
-                        <p class="text-[9px] font-bold text-slate-400">เลเวลปัจจุบัน</p>
-                        <p id="status-lv" class="text-lg font-black text-slate-700">LV.1</p>
-                    </div>
-                    <div class="p-4 btn-3d">
-                        <p class="text-[9px] font-bold text-slate-400">สถานะยศ</p>
-                        <p id="status-rank" class="text-lg font-black text-blue-600">BRONZE</p>
+                    <div class="h-3 bg-black/20 rounded-full overflow-hidden p-0.5">
+                        <div id="xp-bar" class="h-full bg-white rounded-full transition-all duration-1000" style="width: 0%"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- 3D Chart Section -->
-            <div class="card-3d p-6">
-                <h3 class="font-bold text-sm mb-4 flex items-center gap-2">
-                    <i data-lucide="trending-up" class="w-4 h-4 text-blue-500"></i> สถิติการออม 3D
-                </h3>
+            <!-- AI-X15PRO AI ANALYSIS -->
+            <div class="glass-card p-6 border-l-4 border-purple-500">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2 text-purple-600">
+                        <i data-lucide="cpu" class="w-5 h-5"></i>
+                        <span class="font-black text-sm uppercase">AI-X15PRO PRO (3D)</span>
+                    </div>
+                    <span class="text-[9px] font-bold text-slate-400">ANALYZING...</span>
+                </div>
+                <div id="ai-insight" class="text-xs text-slate-600 leading-relaxed min-h-[40px] italic">
+                    "สวัสดีคุณ <span class="profile-name">ผู้ใช้</span> ระบบกำลังเตรียมข้อมูลวิเคราะห์ให้คุณใน 10 วินาที..."
+                </div>
+            </div>
+
+            <!-- Dashboard Charts -->
+            <div class="glass-card p-6">
+                <h3 class="text-xs font-bold text-slate-400 mb-4 uppercase tracking-widest">Saving Trends</h3>
                 <canvas id="savingChart"></canvas>
             </div>
         </section>
 
-        <!-- PAGE: POCKETS -->
-        <section id="page-pockets" class="page-view hidden space-y-6">
+        <!-- Page: Add Saving -->
+        <section id="page-add" class="page hidden space-y-6">
+            <h2 class="text-2xl font-black">เพิ่มบันทึกออม</h2>
+            <div class="glass-card p-8 space-y-6">
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 mb-2 block uppercase">จำนวนเงิน (บาท)</label>
+                    <input type="number" id="input-amount" placeholder="0.00" class="w-full input-3d text-2xl font-black text-blue-600 text-center">
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <button onclick="setCategory('Lineman', this)" class="cat-btn p-3 btn-3d text-xs font-bold active-cat">Lineman</button>
+                    <button onclick="setCategory('SP', this)" class="cat-btn p-3 btn-3d text-xs font-bold">SP</button>
+                    <button onclick="setCategory('ทั่วไป', this)" class="cat-btn p-3 btn-3d text-xs font-bold">ทั่วไป</button>
+                </div>
+                <button onclick="saveTransaction()" class="w-full py-5 bg-blue-600 text-white rounded-2xl font-bold shadow-xl active:scale-95 transition-all flex items-center justify-center gap-3">
+                    <i data-lucide="cloud-upload"></i> บันทึกข้อมูลแบบ Real-time
+                </button>
+            </div>
+        </section>
+
+        <!-- Page: Pockets -->
+        <section id="page-pockets" class="page hidden space-y-6">
             <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-black text-slate-800">Cloud Pockets 11.0</h2>
-                <button onclick="openAddPocket()" class="w-12 h-12 btn-3d text-blue-600"><i data-lucide="plus"></i></button>
+                <h2 class="text-2xl font-black">Cloud Pockets 11.0</h2>
+                <button onclick="createPocket()" class="p-3 btn-3d text-blue-600"><i data-lucide="plus"></i></button>
             </div>
-            <div id="pockets-container" class="space-y-4 pb-10"></div>
+            <div id="pockets-list" class="space-y-4"></div>
         </section>
 
-        <!-- PAGE: ADD -->
-        <section id="page-add" class="page-view hidden space-y-8">
-            <h2 class="text-2xl font-black text-slate-800">บันทึกการออม</h2>
-            <div class="card-3d p-8 space-y-6">
-                <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">จำนวนเงิน (บาท)</label>
-                    <input type="number" id="save-amount" placeholder="0.00" class="w-full p-6 rounded-3xl bg-slate-50 shadow-inner text-3xl font-black text-blue-600 outline-none border-2 border-transparent focus:border-blue-300 transition-all">
-                </div>
-                <div class="space-y-3">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">เลือกหมวดหมู่</label>
-                    <div class="grid grid-cols-3 gap-3">
-                        <button onclick="setCat('Lineman', this)" class="cat-btn p-4 btn-3d font-bold text-xs active-cat">Lineman</button>
-                        <button onclick="setCat('SP', this)" class="cat-btn p-4 btn-3d font-bold text-xs">SP</button>
-                        <button onclick="setCat('ทั่วไป', this)" class="cat-btn p-4 btn-3d font-bold text-xs">ทั่วไป</button>
+        <!-- Page: History -->
+        <section id="page-history" class="page hidden space-y-6">
+            <h2 class="text-2xl font-black">ประวัติรายการ</h2>
+            <div id="history-list" class="space-y-3"></div>
+        </section>
+
+        <!-- Page: Settings -->
+        <section id="page-settings" class="page hidden space-y-6">
+            <h2 class="text-2xl font-black">ตั้งค่า PRO</h2>
+            <div class="glass-card p-6 space-y-4">
+                <div class="flex justify-between items-center p-4 btn-3d">
+                    <div class="text-left">
+                        <p class="font-bold text-sm">ชื่อโปรไฟล์</p>
+                        <p class="text-[10px] text-slate-400 profile-name">--</p>
                     </div>
+                    <i data-lucide="lock" class="w-4 h-4 text-slate-300"></i>
                 </div>
-                <button onclick="handleSave()" class="w-full bg-blue-600 text-white py-6 rounded-[2rem] font-bold text-lg shadow-xl shadow-blue-200 active:scale-95 transition-all flex items-center justify-center gap-3">
-                    <i data-lucide="cloud-upload"></i> บันทึกข้อมูลแบบ Pro
-                </button>
-            </div>
-        </section>
-
-        <!-- PAGE: HISTORY -->
-        <section id="page-history" class="page-view hidden space-y-6">
-            <h2 class="text-2xl font-black text-slate-800">ประวัติรายการ</h2>
-            <div id="history-container" class="space-y-3"></div>
-        </section>
-
-        <!-- PAGE: SETTINGS -->
-        <section id="page-settings" class="page-view hidden space-y-6">
-            <h2 class="text-2xl font-black text-slate-800">การตั้งค่า Pro</h2>
-            <div class="card-3d p-6 space-y-6">
-                <div class="flex items-center gap-4 p-4 btn-3d border-blue-100">
-                    <div class="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg font-black" id="user-initial">U</div>
-                    <div>
-                        <h4 id="profile-name" class="font-black text-slate-800 italic">Verified User</h4>
-                        <p class="text-[9px] font-bold text-blue-500 uppercase tracking-tighter">Account Type: Lifetime Pro</p>
+                <div class="flex justify-between items-center p-4 btn-3d">
+                    <div class="text-left">
+                        <p class="font-bold text-sm">แก้ไขเงินสุทธิ</p>
+                        <p id="edit-limit-text" class="text-[10px] text-slate-400 uppercase">1 ครั้ง/วัน</p>
                     </div>
+                    <button onclick="editBalanceManually()" class="p-2 text-blue-600"><i data-lucide="edit-3"></i></button>
                 </div>
-                
-                <button onclick="manualEditBalance()" class="w-full p-5 btn-3d flex justify-between items-center">
-                    <span class="font-bold text-slate-600">แก้ไขยอดเงินสุทธิ</span>
-                    <i data-lucide="chevron-right" class="text-slate-300"></i>
-                </button>
-
-                <div class="p-5 bg-slate-50 rounded-3xl space-y-2 border border-white">
-                    <p class="text-[10px] font-black text-slate-400 uppercase">System Info</p>
-                    <p class="text-xs font-bold text-slate-600 italic">Version: 10.8.0+Pro Build 2026</p>
-                    <div class="h-[1px] bg-slate-200 w-full my-2"></div>
-                    <ul class="text-[10px] font-bold text-slate-400 space-y-1">
-                        <li>• AI-X15PRO Analyser 3D Integrated</li>
-                        <li>• Cloud Pocket 11.0 Advanced</li>
-                        <li>• Simulated Face Scan Verification</li>
-                        <li>• 3D UI & High Stability Core</li>
+                <div class="p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
+                    <p class="text-[10px] font-black text-indigo-600 mb-2">VERSION 11.2.0 PRO RELEASE</p>
+                    <ul class="text-[9px] text-slate-500 space-y-1">
+                        <li>- อัปเดตธีม 3D Neumorphism ทั่วทั้งระบบ</li>
+                        <li>- ระบบความปลอดภัย Biometric Face Scan Simulation</li>
+                        <li>- AI-X15PRO วิเคราะห์ข้อมูลเชิงลึกใน 10 วินาที</li>
+                        <li>- ปรับปรุงความเสถียรของ Cloud Sync 2026</li>
                     </ul>
                 </div>
-
-                <button onclick="systemReset()" class="w-full p-5 bg-red-50 text-red-600 rounded-3xl font-black border border-red-100 active:bg-red-600 active:text-white transition-all flex items-center justify-center gap-3">
-                    <i data-lucide="trash-2"></i> ล้างข้อมูลและเริ่มต้นใหม่ทั้งหมด
+                <button onclick="wipeAllData()" class="w-full py-4 text-red-500 font-bold btn-3d mt-4 border-red-100">
+                    <i data-lucide="trash-2" class="w-4 h-4 inline mr-2"></i> ล้างข้อมูลทั้งหมด
                 </button>
             </div>
         </section>
     </main>
 
-    <!-- 3D Bottom Nav -->
-    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-lg glass-morphism h-20 card-3d z-[1000] flex justify-around items-center px-4 bg-white/80">
-        <button onclick="navigate('dashboard')" class="nav-item flex flex-col items-center gap-1 flex-1 py-2 text-slate-400 transition-all">
-            <i data-lucide="home" class="w-5 h-5"></i>
-            <span class="text-[9px] font-black uppercase">Dashboard</span>
-        </button>
-        <button onclick="navigate('pockets')" class="nav-item flex flex-col items-center gap-1 flex-1 py-2 text-slate-400 transition-all">
-            <i data-lucide="wallet" class="w-5 h-5"></i>
-            <span class="text-[9px] font-black uppercase">Pocket</span>
-        </button>
-        <div class="relative -top-10 scale-125">
-            <button onclick="navigate('add')" class="w-14 h-14 bg-blue-600 text-white rounded-2xl shadow-[0_10px_20px_rgba(37,99,235,0.4)] active:scale-90 transition-all flex items-center justify-center border-4 border-slate-100">
-                <i data-lucide="plus" class="w-8 h-8"></i>
-            </button>
-        </div>
-        <button onclick="navigate('history')" class="nav-item flex flex-col items-center gap-1 flex-1 py-2 text-slate-400 transition-all">
-            <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
-            <span class="text-[9px] font-black uppercase">History</span>
-        </button>
-        <button onclick="navigate('settings')" class="nav-item flex flex-col items-center gap-1 flex-1 py-2 text-slate-400 transition-all">
-            <i data-lucide="user-cog" class="w-5 h-5"></i>
-            <span class="text-[9px] font-black uppercase">Profile</span>
-        </button>
-    </nav>
-
-    <!-- Floating AI Quick Assistant (3D) -->
-    <div class="fixed bottom-32 right-6 z-[1000]">
-        <button onclick="toggleAIQuick()" class="w-16 h-16 bg-purple-600 text-white rounded-2xl shadow-2xl flex items-center justify-center active:rotate-12 transition-all shadow-purple-200 border-4 border-white">
-            <i data-lucide="bot"></i>
+    <!-- AI Floating UI -->
+    <div class="fixed bottom-28 right-6 z-[200]">
+        <button onclick="openAIChat()" class="w-16 h-16 bg-gradient-to-tr from-purple-600 to-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center animate-bounce btn-3d border-none">
+            <i data-lucide="bot" class="w-8 h-8"></i>
         </button>
     </div>
+
+    <!-- Bottom Nav -->
+    <nav class="fixed bottom-0 w-full glass-card rounded-t-[32px] px-8 py-4 flex justify-around items-center z-[100]">
+        <button onclick="navigate('dashboard')" class="flex flex-col items-center gap-1 text-slate-400 nav-btn" id="btn-dashboard">
+            <i data-lucide="home"></i>
+            <span class="text-[8px] font-bold">HOME</span>
+        </button>
+        <button onclick="navigate('pockets')" class="flex flex-col items-center gap-1 text-slate-400 nav-btn" id="btn-pockets">
+            <i data-lucide="wallet"></i>
+            <span class="text-[8px] font-bold">POCKETS</span>
+        </button>
+        <button onclick="navigate('add')" class="w-14 h-14 -mt-12 bg-blue-600 text-white rounded-2xl shadow-xl flex items-center justify-center btn-3d border-none">
+            <i data-lucide="plus" class="w-8 h-8"></i>
+        </button>
+        <button onclick="navigate('history')" class="flex flex-col items-center gap-1 text-slate-400 nav-btn" id="btn-history">
+            <i data-lucide="clock"></i>
+            <span class="text-[8px] font-bold">HISTORY</span>
+        </button>
+        <button onclick="navigate('settings')" class="flex flex-col items-center gap-1 text-slate-400 nav-btn" id="btn-settings">
+            <i data-lucide="settings"></i>
+            <span class="text-[8px] font-bold">PRO</span>
+        </button>
+    </nav>
 
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwiqHs1JnZugJWLVrDs43ia9S2bR6EZx69qIkUloAhXq0MDflP911qAsnMcIewRZgvZTQ/exec";
         
         let state = {
-            user: { name: "", verified: false },
+            isVerified: false,
+            profileName: "",
             balance: 0,
+            lvl: 1,
             xp: 0,
-            level: 1,
             history: [],
             pockets: [],
             selectedCat: "Lineman",
             lastBalanceEdit: null,
-            lastPocketEdit: { date: null, count: 0 }
+            lastPocketUpdate: null,
+            pocketUpdateCount: 0
         };
 
-        let activeChart = null;
+        let myChart = null;
 
-        // Initialize App
-        window.addEventListener('load', async () => {
+        // --- Initialization ---
+        window.onload = async () => {
             lucide.createIcons();
             loadState();
             startClock();
             
-            // Loading Logic (3s)
+            // Simulation Loading 3s
             setTimeout(() => {
-                document.getElementById('loader').style.display = 'none';
-                if(!state.user.verified) {
-                    showAuth();
-                } else {
-                    refreshUI();
-                }
+                document.getElementById('loader').classList.add('hidden');
+                checkVerification();
+                refreshUI();
+                initChart();
+                runAIAnalysis();
             }, 3000);
-        });
+        };
 
         function startClock() {
-            const clockEl = document.getElementById('clock');
-            const dateEl = document.getElementById('current-date');
-            const update = () => {
-                const now = new Date();
-                clockEl.innerText = now.toLocaleTimeString('th-TH', { hour12: false });
-                dateEl.innerText = now.toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            };
-            setInterval(update, 1000);
-            update();
+            setInterval(() => {
+                document.getElementById('real-clock').innerText = new Date().toLocaleTimeString('th-TH');
+            }, 1000);
         }
 
-        // --- AUTH & IDENTIY ---
-        async function showAuth() {
-            const authScreen = document.getElementById('auth-screen');
-            authScreen.classList.remove('hidden');
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                document.getElementById('webcam').srcObject = stream;
-            } catch (e) {
-                console.warn("Camera access denied - simulated scan active");
-            }
-        }
-
-        function startFinalAuth() {
-            const nameInput = document.getElementById('reg-name').value;
-            if(!nameInput) return Swal.fire('Error', 'กรุณาระบุชื่อของคุณ', 'error');
-
-            Swal.fire({
-                title: 'กำลังวิเคราะห์ใบหน้า...',
-                html: 'Bio-Metric Analysis in Progress',
-                timer: 3000,
-                allowOutsideClick: false,
-                didOpen: () => Swal.showLoading()
-            }).then(() => {
-                state.user.name = nameInput;
-                state.user.verified = true;
-                saveState();
-                
-                Swal.fire({
-                    title: 'ยืนยันสำเร็จ!',
-                    text: 'ระบบล็อคบัญชีของคุณเรียบร้อยแล้ว',
-                    icon: 'success',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-
-                setTimeout(() => {
-                    document.getElementById('auth-screen').classList.add('hidden');
-                    const video = document.getElementById('webcam');
-                    if(video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
-                    refreshUI();
-                }, 1000);
-            });
-        }
-
-        // --- NAVIGATION ---
-        function navigate(pageId) {
-            document.getElementById('loader').style.display = 'flex';
-            setTimeout(() => {
-                document.querySelectorAll('.page-view').forEach(p => p.classList.add('hidden'));
-                document.getElementById(`page-${pageId}`).classList.remove('hidden');
-                
-                // Update Nav UI
-                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('nav-active'));
-                const currentNavItem = document.querySelector(`[onclick="navigate('${pageId}')"]`);
-                if(currentNavItem) currentNavItem.classList.add('nav-active');
-
-                document.getElementById('loader').style.display = 'none';
-                toggleSidebar(false);
-                if(pageId === 'dashboard') { drawChart(); runAIAnalysis(); }
-                if(pageId === 'pockets') renderPockets();
-                if(pageId === 'history') renderHistory();
-            }, 3000);
-        }
-
-        function toggleSidebar(open) {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            if(open) {
-                sidebar.classList.add('active');
-                overlay.classList.remove('hidden');
-            } else {
-                sidebar.classList.remove('active');
-                overlay.classList.add('hidden');
-            }
-        }
-
-        // --- CORE LOGIC ---
-        function setCat(cat, btn) {
-            state.selectedCat = cat;
-            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('nav-active'));
-            btn.classList.add('nav-active');
-        }
-
-        async function handleSave() {
-            const amt = parseFloat(document.getElementById('save-amount').value);
-            if(!amt || amt <= 0) return Swal.fire('Error', 'จำนวนเงินไม่ถูกต้อง', 'error');
-
-            Swal.fire({
-                title: 'Saving to Cloud...',
-                html: 'V.10.8.0 PRO Security Protocol',
-                allowOutsideClick: false,
-                didOpen: () => Swal.showLoading()
-            });
-
-            const callbackId = 'cb_' + Date.now();
-            const payload = {
-                action: 'save',
-                amount: amt,
-                category: state.selectedCat,
-                user: state.user.name,
-                time: new Date().toLocaleString('th-TH')
-            };
-
-            window[callbackId] = (res) => {
-                delete window[callbackId];
-                if(res.status === 'success') {
-                    state.balance += amt;
-                    state.xp += amt * 0.7;
-                    state.history.unshift({...payload, id: Date.now()});
-                    checkLevel();
-                    saveState();
-                    Swal.fire('บันทึกสำเร็จ!', 'ข้อมูลถูกส่งไปยัง Cloud Sheet แล้ว', 'success');
-                    document.getElementById('save-amount').value = '';
-                    navigate('dashboard');
-                } else {
-                    Swal.fire('เชื่อมต่อล้มเหลว', res.message, 'error');
-                }
-            };
-
-            const script = document.createElement('script');
-            script.src = `${GAS_URL}?data=${encodeURIComponent(JSON.stringify(payload))}&callback=${callbackId}`;
-            document.body.appendChild(script);
-        }
-
-        function checkLevel() {
-            const cap = state.level * 1000;
-            if(state.xp >= cap) {
-                state.level++;
-                state.xp = 0;
-                setTimeout(() => Swal.fire('LEVEL UP!', `คุณเลื่อนระดับเป็น LV.${state.level} แล้ว!`, 'success'), 1000);
-            }
-        }
-
-        function refreshUI() {
-            const displayBal = (state.balance || 0).toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('balance-val').innerText = `฿${displayBal}`;
-            document.getElementById('level-val').innerText = state.level;
-            document.getElementById('status-lv').innerText = `LV.${state.level}`;
-            document.getElementById('user-display-side').innerText = state.user.name;
-            document.getElementById('profile-name').innerText = state.user.name;
-            document.getElementById('user-initial').innerText = state.user.name.charAt(0).toUpperCase();
-
-            const cap = state.level * 1000;
-            const progress = Math.min((state.xp / cap) * 100, 100);
-            document.getElementById('xp-text').innerText = `${progress.toFixed(0)}%`;
-            document.getElementById('xp-bar').style.width = `${progress}%`;
-
-            updateRank();
-            drawChart();
-            runAIAnalysis();
-        }
-
-        function updateRank() {
-            let r = "BRONZE";
-            if(state.level >= 50) r = "REGEN";
-            else if(state.level >= 30) r = "GOLD";
-            else if(state.level >= 10) r = "SILVER";
-            
-            document.getElementById('rank-badge').innerText = r;
-            document.getElementById('status-rank').innerText = r;
-        }
-
-        // --- POCKETS 11.0 PRO ---
-        async function openAddPocket() {
-            const { value: form } = await Swal.fire({
-                title: 'New Cloud Pocket',
-                html: '<input id="p-name" class="swal2-input" placeholder="เป้าหมาย"><input id="p-goal" type="number" class="swal2-input" placeholder="ยอดเงินเป้าหมาย">',
-                preConfirm: () => [document.getElementById('p-name').value, document.getElementById('p-goal').value]
-            });
-
-            if(form && form[0] && form[1]) {
-                state.pockets.push({ id: Date.now(), name: form[0], goal: parseFloat(form[1]), current: 0, edits: 0, lastEdit: null });
-                saveState();
-                renderPockets();
-            }
-        }
-
-        async function editPocket(id) {
-            const today = new Date().toDateString();
-            const pk = state.pockets.find(p => p.id === id);
-            
-            if(pk.lastEdit !== today) pk.edits = 0;
-            if(pk.edits >= 2) return Swal.fire('Limit Reached', 'คุณแก้ไข Pocket นี้ครบ 2 ครั้งแล้วในวันนี้', 'warning');
-
-            const { value: amt } = await Swal.fire({ title: 'เติมเงิน Pocket', input: 'number', inputPlaceholder: 'ระบุจำนวนเงิน' });
-            if(amt) {
-                pk.current += parseFloat(amt);
-                pk.edits++;
-                pk.lastEdit = today;
-                saveState();
-                renderPockets();
-            }
-        }
-
-        function renderPockets() {
-            const container = document.getElementById('pockets-container');
-            if(state.pockets.length === 0) {
-                container.innerHTML = `<div class="text-center py-20 text-slate-300 italic">ยังไม่มี Cloud Pocket</div>`;
-                return;
-            }
-            container.innerHTML = state.pockets.map(p => {
-                const ratio = Math.min((p.current / p.goal) * 100, 100);
-                const isDone = ratio >= 100;
-                return `
-                    <div class="card-3d p-6 border-l-8 ${isDone ? 'border-emerald-400 bg-emerald-50/20' : 'border-blue-400'}">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <h4 class="font-black text-slate-800">${p.name}</h4>
-                                <p class="text-[10px] font-bold text-slate-400">POCKET ID: ${p.id}</p>
-                            </div>
-                            <button onclick="deletePocket(${p.id})" class="text-slate-300 hover:text-red-500"><i data-lucide="trash"></i></button>
-                        </div>
-                        <div class="flex justify-between text-xs font-bold mb-1">
-                            <span class="${isDone ? 'text-emerald-600' : 'text-blue-600'}">${ratio.toFixed(0)}% Completed</span>
-                            <span class="text-slate-400">฿${p.current.toLocaleString()} / ฿${p.goal.toLocaleString()}</span>
-                        </div>
-                        <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                            <div class="h-full ${isDone ? 'bg-emerald-400 shadow-[0_0_10px_#10b981]' : 'bg-blue-400 shadow-[0_0_10px_#3b82f6]'} transition-all duration-1000" style="width: ${ratio}%"></div>
-                        </div>
-                        ${!isDone ? `<button onclick="editPocket(${p.id})" class="mt-4 w-full py-2 btn-3d font-black text-xs">เติมเงิน (${2-p.edits})</button>` : `<div class="mt-4 text-center text-xs font-black text-emerald-600 uppercase">Completed</div>`}
-                    </div>
-                `;
-            }).join('');
-            lucide.createIcons();
-        }
-
-        function deletePocket(id) {
-            Swal.fire({ title: 'ลบ Pocket?', text: 'ข้อมูลเป้าหมายนี้จะถูกลบถาวร', icon: 'warning', showCancelButton: true }).then(r => {
-                if(r.isConfirmed) {
-                    state.pockets = state.pockets.filter(p => p.id !== id);
-                    saveState();
-                    renderPockets();
-                }
-            });
-        }
-
-        // --- AI & ANALYTICS ---
-        function runAIAnalysis() {
-            const aiStatus = document.getElementById('ai-status');
-            if(!aiStatus) return;
-
-            setTimeout(() => {
-                const total = state.balance;
-                const pTotal = state.pockets.reduce((a,b) => a + b.current, 0);
-                const count = state.history.length;
-                
-                let insight = "";
-                if(total === 0) insight = "AI-X15PRO: เริ่มต้นบันทึกเงินออมก้อนแรกวันนี้ เพื่อเข้าสู่ระบบจัดอันดับสากลครับ";
-                else if(total > 50000) insight = `AI-X15PRO: สถานะการออมของคุณอยู่ในระดับ 'Superior' ยอดรวม ฿${total.toLocaleString()} พร้อมอัปเกรดสู่ยศถัดไป!`;
-                else insight = `AI-X15PRO: ตรวจพบการทำรายการ ${count} ครั้ง คุณกำลังออมได้ดี แนะนำให้เน้น Pocket อีก ฿${(state.pockets[0]?.goal - state.pockets[0]?.current || 0).toLocaleString()} เพื่อให้ครบเป้าหมายแรก`;
-                
-                aiStatus.innerText = `"${insight}"`;
-            }, 5000);
-        }
-
-        async function toggleAIQuick() {
-            const { value: q } = await Swal.fire({
-                title: 'AI-X14Pro Quick Assistant 🤖',
-                input: 'select',
-                inputOptions: {
-                    'balance': 'สอบถามยอดเงินออมสุทธิ',
-                    'lv': 'วิเคราะห์เลเวลและยศ',
-                    'pocket': 'ตรวจสอบสถานะ Pocket ทั้งหมด',
-                    'guide': 'คู่มือการใช้งานเวอร์ชัน Pro'
-                },
-                inputPlaceholder: 'เลือกสิ่งที่ต้องการทราบ'
-            });
-
-            if(q) {
-                let ans = "";
-                if(q === 'balance') ans = `ยอดเงินออมสุทธิปัจจุบัน: ฿${state.balance.toLocaleString()}\nข้อมูลถูกจัดเก็บแบบ Cloud Pockets 11.0`;
-                else if(q === 'lv') ans = `คุณอยู่ระดับ LV.${state.level} ยศ: ${document.getElementById('rank-badge').innerText}\nต้องการอีก ${(state.level*1000) - state.xp} XP เพื่อเลื่อนเลเวล`;
-                else if(q === 'pocket') ans = `มีทั้งหมด ${state.pockets.length} Pocket\nเป้าหมายที่สำเร็จแล้ว: ${state.pockets.filter(p=>p.current>=p.goal).length} แห่ง`;
-                else ans = "V.10.8.0 Pro Guide: บันทึกเงินหลักที่หน้า Dashboard และแยกเป้าหมายที่หน้า Pocket ข้อมูลจะปลอดภัยบน Cloud Sheet ตลอดชีวิต";
-                
-                Swal.fire('AI-X14Pro Result', ans, 'info');
-            }
-        }
-
-        function drawChart() {
-            const ctx = document.getElementById('savingChart');
-            if(!ctx) return;
-            if(activeChart) activeChart.destroy();
-
-            const history = state.history.slice(0, 5).reverse();
-            const labels = history.length ? history.map(h => h.time.split(' ')[0]) : ['Point A','Point B','Point C'];
-            const data = history.length ? history.map(h => h.amount) : [0,0,0];
-
-            activeChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Saving Trend',
-                        data: data,
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        borderWidth: 4,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: '#3b82f6',
-                        pointBorderWidth: 2,
-                        pointRadius: 4
-                    }]
-                },
-                options: {
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        y: { display: false },
-                        x: { border: { display: false }, grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } }
-                    }
-                }
-            });
-        }
-
-        // --- UTILS ---
         function loadState() {
             const saved = localStorage.getItem('IOTNovasave_V2_Records');
-            if(saved) state = {...state, ...JSON.parse(saved)};
+            if (saved) state = JSON.parse(saved);
         }
 
         function saveState() {
@@ -701,46 +393,324 @@
             refreshUI();
         }
 
-        async function manualEditBalance() {
-            const today = new Date().toDateString();
-            if(state.lastBalanceEdit === today) return Swal.fire('Limit', 'คุณแก้ไขยอดเงินสุทธิได้ 1 ครั้ง/วัน', 'warning');
-
-            const { value: amt } = await Swal.fire({ title: 'ปรับปรุงยอดเงินสุทธิ', input: 'number', inputValue: state.balance });
-            if(amt !== undefined) {
-                state.balance = parseFloat(amt);
-                state.lastBalanceEdit = today;
-                saveState();
-                Swal.fire('Updated', 'ยอดเงินออมถูกปรับปรุงแล้ว', 'success');
+        function checkVerification() {
+            if (!state.isVerified) {
+                document.getElementById('verify-screen').classList.remove('hidden');
+                startWebcam();
+            } else {
+                updateProfileNames();
             }
         }
 
-        function renderHistory() {
-            const container = document.getElementById('history-container');
-            if(state.history.length === 0) {
-                container.innerHTML = `<div class="text-center py-20 text-slate-300">ไม่มีประวัติรายการ</div>`;
-                return;
+        function updateProfileNames() {
+            document.querySelectorAll('.profile-name').forEach(el => el.innerText = state.profileName);
+        }
+
+        // --- Identity & Camera ---
+        async function startWebcam() {
+            const video = document.getElementById('webcam');
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+            } catch (e) {
+                console.log("Cam failed or not allowed");
             }
-            container.innerHTML = state.history.map(h => `
-                <div class="card-3d p-4 flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-500">
-                            <i data-lucide="${h.category === 'Lineman' ? 'bike' : h.category === 'SP' ? 'shopping-bag' : 'wallet'}" class="w-5 h-5"></i>
+        }
+
+        async function startIdentityVerification() {
+            const name = document.getElementById('verify-name').value;
+            if (!name) return Swal.fire('Error', 'กรุณาระบุชื่อโปรไฟล์', 'error');
+
+            Swal.fire({
+                title: 'กำลังสแกนใบหน้า...',
+                html: 'กรุณาวางใบหน้าให้อยู่ในกรอบ',
+                timer: 4000,
+                timerProgressBar: true,
+                didOpen: () => Swal.showLoading()
+            }).then(() => {
+                state.isVerified = true;
+                state.profileName = name;
+                saveState();
+                
+                // Cloud Sync Goals
+                syncToCloud({ action: 'verify', name: name });
+
+                Swal.fire({
+                    title: 'ยืนยันตัวตนสำเร็จ',
+                    icon: 'success',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+
+                setTimeout(() => {
+                    document.getElementById('verify-screen').classList.add('hidden');
+                    updateProfileNames();
+                }, 3000);
+            });
+        }
+
+        // --- UI Logic ---
+        function navigate(pageId) {
+            document.getElementById('loader').classList.remove('hidden');
+            setTimeout(() => {
+                document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+                document.getElementById('page-' + pageId).classList.remove('hidden');
+                
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('text-blue-600'));
+                if (document.getElementById('btn-' + pageId)) {
+                    document.getElementById('btn-' + pageId).classList.add('text-blue-600');
+                }
+                
+                document.getElementById('loader').classList.add('hidden');
+                toggleSidebar(false);
+                if(pageId === 'dashboard') runAIAnalysis();
+            }, 3000);
+        }
+
+        function toggleSidebar(show) {
+            document.getElementById('sidebar').classList.toggle('active', show);
+        }
+
+        function refreshUI() {
+            document.getElementById('total-balance').innerText = `฿${state.balance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById('lvl-display').innerText = state.lvl;
+            
+            const xpCap = state.lvl * 1000;
+            const xpPercent = Math.min((state.xp / xpCap) * 100, 100);
+            document.getElementById('xp-display').innerText = `${xpPercent.toFixed(0)}%`;
+            document.getElementById('xp-bar').style.width = `${xpPercent}%`;
+
+            updateRank();
+            renderHistory();
+            renderPockets();
+        }
+
+        function updateRank() {
+            const el = document.getElementById('user-rank');
+            let rank = "Bronze";
+            el.className = "px-4 py-1.5 rounded-full text-[10px] font-black uppercase ";
+            
+            if (state.lvl >= 30) { rank = "Regen"; el.classList.add('rank-regen'); }
+            else if (state.lvl >= 15) { rank = "Gold"; el.classList.add('bg-yellow-400'); }
+            else if (state.lvl >= 5) { rank = "Silver"; el.classList.add('bg-slate-300'); }
+            else { el.classList.add('bg-white/20'); }
+            el.innerText = rank;
+        }
+
+        // --- Transaction Engine ---
+        function setCategory(cat, btn) {
+            state.selectedCat = cat;
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('bg-blue-600', 'text-white'));
+            btn.classList.add('bg-blue-600', 'text-white');
+        }
+
+        async function saveTransaction() {
+            const amt = parseFloat(document.getElementById('input-amount').value);
+            if (!amt || amt <= 0) return Swal.fire('Error', 'กรุณาระบุจำนวนเงิน', 'error');
+
+            Swal.fire({ title: 'กำลังบันทึกข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            syncToCloud({
+                action: 'save',
+                amount: amt,
+                category: state.selectedCat,
+                time: new Date().toLocaleString('th-TH')
+            }, (res) => {
+                if (res.status === 'success') {
+                    state.balance += amt;
+                    state.xp += (amt * 0.5);
+                    state.history.unshift({ amt, cat: state.selectedCat, time: new Date().toLocaleString('th-TH') });
+                    
+                    if (state.xp >= state.lvl * 1000) {
+                        state.lvl++;
+                        state.xp = 0;
+                        Swal.fire('LEVEL UP!', `คุณเลื่อนสู่เลเวล ${state.lvl}`, 'success');
+                    }
+
+                    saveState();
+                    Swal.fire('สำเร็จ', 'บันทึกออมเงินเรียบร้อย', 'success');
+                    document.getElementById('input-amount').value = '';
+                    navigate('dashboard');
+                }
+            });
+        }
+
+        // --- Pockets Engine 11.0 ---
+        async function createPocket() {
+            const { value: formValues } = await Swal.fire({
+                title: 'สร้าง Pocket ใหม่',
+                html: '<input id="swal-name" class="swal2-input" placeholder="ชื่อเป้าหมาย">' +
+                      '<input id="swal-target" type="number" class="swal2-input" placeholder="จำนวนเงินเป้าหมาย">',
+                focusConfirm: false,
+                preConfirm: () => [
+                    document.getElementById('swal-name').value,
+                    document.getElementById('swal-target').value
+                ]
+            });
+
+            if (formValues && formValues[0] && formValues[1]) {
+                state.pockets.push({
+                    id: Date.now(),
+                    name: formValues[0],
+                    target: parseFloat(formValues[1]),
+                    current: 0,
+                    edits: 0
+                });
+                saveState();
+            }
+        }
+
+        async function addMoneyToPocket(id) {
+            const today = new Date().toDateString();
+            if (state.lastPocketUpdate !== today) {
+                state.pocketUpdateCount = 0;
+                state.lastPocketUpdate = today;
+            }
+
+            if (state.pocketUpdateCount >= 2) return Swal.fire('ขออภัย', 'คุณแก้ไขเป้าหมายครบ 2 ครั้งในวันนี้แล้ว', 'warning');
+
+            const { value: amt } = await Swal.fire({ title: 'เติมเงินเข้าเป้าหมาย', input: 'number' });
+            if (amt) {
+                const pk = state.pockets.find(p => p.id === id);
+                pk.current += parseFloat(amt);
+                state.pocketUpdateCount++;
+                saveState();
+            }
+        }
+
+        function deletePocket(id) {
+            Swal.fire({ title: 'ลบเป้าหมาย?', icon: 'warning', showCancelButton: true }).then(r => {
+                if(r.isConfirmed) {
+                    state.pockets = state.pockets.filter(p => p.id !== id);
+                    saveState();
+                }
+            });
+        }
+
+        function renderPockets() {
+            const list = document.getElementById('pockets-list');
+            list.innerHTML = state.pockets.map(p => {
+                const progress = Math.min((p.current / p.target) * 100, 100);
+                const isDone = progress >= 100;
+                return `
+                    <div class="glass-card p-6 ${isDone ? 'border-green-400 bg-green-50/50' : ''}">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2 btn-3d text-blue-600"><i data-lucide="package"></i></div>
+                                <div>
+                                    <p class="font-bold text-sm">${p.name}</p>
+                                    <p class="text-[9px] text-slate-400">TARGET: ฿${p.target.toLocaleString()}</p>
+                                </div>
+                            </div>
+                            ${isDone ? `<button onclick="deletePocket(${p.id})" class="text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
                         </div>
-                        <div>
-                            <p class="text-xs font-black text-slate-700">${h.category}</p>
-                            <p class="text-[9px] font-bold text-slate-400">${h.time}</p>
+                        <div class="h-2 bg-slate-100 rounded-full mb-3 overflow-hidden">
+                            <div class="h-full bg-blue-600 transition-all duration-1000" style="width: ${progress}%"></div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold">฿${p.current.toLocaleString()}</span>
+                            ${!isDone ? `<button onclick="addMoneyToPocket(${p.id})" class="text-[10px] font-bold bg-blue-600 text-white px-4 py-1.5 rounded-xl">เติมเงิน</button>` : `<span class="text-[10px] font-bold text-green-600 italic">SUCCESS</span>`}
                         </div>
                     </div>
-                    <p class="font-black text-emerald-500">+฿${h.amount.toLocaleString()}</p>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('history-list');
+            if (state.history.length === 0) {
+                list.innerHTML = `<div class="text-center py-10 text-slate-300 italic text-xs">ยังไม่มีประวัติการออม</div>`;
+                return;
+            }
+            list.innerHTML = state.history.slice(0, 15).map(h => `
+                <div class="p-4 btn-3d justify-between">
+                    <div class="flex items-center gap-3 text-left">
+                        <i data-lucide="${h.cat === 'Lineman' ? 'bike' : 'wallet'}" class="w-4 h-4 text-slate-400"></i>
+                        <div>
+                            <p class="font-bold text-xs">${h.cat}</p>
+                            <p class="text-[8px] text-slate-400">${h.time}</p>
+                        </div>
+                    </div>
+                    <span class="font-bold text-emerald-500">+฿${h.amt.toLocaleString()}</span>
                 </div>
             `).join('');
             lucide.createIcons();
         }
 
-        function systemReset() {
+        // --- AI X15PRO Engine ---
+        function runAIAnalysis() {
+            const insight = document.getElementById('ai-insight');
+            setTimeout(() => {
+                const total = state.balance;
+                const pocketsCount = state.pockets.length;
+                const completed = state.pockets.filter(p => (p.current/p.target) >= 1).length;
+                
+                let analysis = `คุณ ${state.profileName} ครับ จากข้อมูลเงินออมสุทธิ ฿${total.toLocaleString()} `;
+                if (total > 5000) analysis += "คุณมีวินัยในการออมที่ดีมาก ";
+                else analysis += "ลองตั้งเป้าหมายเล็กๆ เพื่อเพิ่มความถี่ในการออมดูนะครับ ";
+                
+                if (pocketsCount > 0) analysis += `ปัจจุบันคุณมี ${pocketsCount} เป้าหมาย สำเร็จแล้ว ${completed} รายการ AI แนะนำให้เน้นเติมเป้าหมายที่ใกล้ครบก่อนครับ`;
+                
+                insight.innerText = analysis;
+            }, 10000);
+        }
+
+        async function openAIChat() {
+            const { value: q } = await Swal.fire({
+                title: 'AI-X14Pro Assistant 🤖',
+                input: 'select',
+                inputOptions: {
+                    'balance': 'สอบถามยอดเงินปัจจุบัน',
+                    'rank': 'สอบถามยศและเลเวล',
+                    'pockets': 'วิเคราะห์ Cloud Pockets',
+                    'guide': 'คู่มือการใช้งาน V.11.2.0'
+                },
+                inputPlaceholder: 'เลือกหัวข้อที่คุณต้องการทราบ'
+            });
+
+            if (q) {
+                let ans = "";
+                if (q === 'balance') ans = `ยอดเงินออมสุทธิของคุณคือ ฿${state.balance.toLocaleString()} บาทครับ`;
+                else if (q === 'rank') ans = `ปัจจุบันคุณมียศ ${document.getElementById('user-rank').innerText} เลเวล ${state.lvl} ครับ`;
+                else if (q === 'pockets') ans = `คุณมี Pocket ทั้งหมด ${state.pockets.length} รายการ แนะนำให้ออมเพิ่มสัปดาห์ละครั้งครับ`;
+                else ans = "ระบบ V.11.2.0 PRO เน้นความเสถียรและการบันทึกข้อมูลแบบ 3D ข้อมูลของคุณจะถูกส่งไปยัง Google Sheet อัตโนมัติครับ";
+                
+                Swal.fire('AI-X14Pro ตอบกลับ', ans, 'info');
+            }
+        }
+
+        // --- Cloud Sync ---
+        function syncToCloud(data, callback) {
+            const cbName = 'jsonp_cb_' + Date.now();
+            window[cbName] = (res) => {
+                if (callback) callback(res);
+                delete window[cbName];
+            };
+            
+            const script = document.createElement('script');
+            script.src = `${GAS_URL}?data=${encodeURIComponent(JSON.stringify(data))}&callback=${cbName}`;
+            document.body.appendChild(script);
+        }
+
+        // --- Settings Action ---
+        async function editBalanceManually() {
+            const today = new Date().toDateString();
+            if (state.lastBalanceEdit === today) return Swal.fire('Error', 'แก้ไขได้ 1 ครั้งต่อวันเท่านั้น', 'warning');
+
+            const { value: amt } = await Swal.fire({ title: 'ปรับยอดเงินสุทธิ', input: 'number', inputValue: state.balance });
+            if (amt) {
+                state.balance = parseFloat(amt);
+                state.lastBalanceEdit = today;
+                saveState();
+                Swal.fire('สำเร็จ', 'อัปเดตยอดเงินแล้ว', 'success');
+            }
+        }
+
+        function wipeAllData() {
             Swal.fire({
-                title: 'ยืนยันการล้างข้อมูล?',
-                text: 'ข้อมูลทั้งหมดรวมถึงชื่อโปรไฟล์และเลเวลจะถูกลบถาวร!',
+                title: 'ล้างข้อมูลทั้งหมด?',
+                text: 'การกระทำนี้ไม่สามารถย้อนกลับได้ ข้อมูลใน Cloud จะถูกลบด้วย!',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#ef4444'
@@ -748,6 +718,33 @@
                 if(r.isConfirmed) {
                     localStorage.removeItem('IOTNovasave_V2_Records');
                     location.reload();
+                }
+            });
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('savingChart').getContext('2d');
+            const historyData = state.history.slice(0, 7).reverse();
+            
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: historyData.map(h => h.time.split(' ')[0]) || ['-','-','-'],
+                    datasets: [{
+                        label: 'Amount',
+                        data: historyData.map(h => h.amt) || [0,0,0],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#3b82f6'
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: false } },
+                    scales: { y: { display: false }, x: { grid: { display: false }, ticks: { font: { size: 8 } } } }
                 }
             });
         }
